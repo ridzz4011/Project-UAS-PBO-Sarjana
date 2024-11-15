@@ -4,6 +4,13 @@
  */
 package MainPackage;
 
+import DatabaseConnection.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import javax.swing.JOptionPane;
+
 /**
  *
  * @author soery
@@ -110,7 +117,7 @@ public class formLogin extends javax.swing.JFrame {
         jPanel1.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         Title.setFont(new java.awt.Font("Times New Roman", 1, 37)); // NOI18N
-        Title.setForeground(new java.awt.Color(255, 255, 255));
+        Title.setForeground(new java.awt.Color(0, 0, 0));
         Title.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
         Title.setText("Remind Me!");
         jPanel1.add(Title, new org.netbeans.lib.awtextra.AbsoluteConstraints(340, 60, 210, 50));
@@ -135,33 +142,33 @@ public class formLogin extends javax.swing.JFrame {
         jPanel1.add(registButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(410, 250, 100, 20));
 
         words.setFont(new java.awt.Font("Times New Roman", 2, 12)); // NOI18N
-        words.setForeground(new java.awt.Color(255, 255, 255));
+        words.setForeground(new java.awt.Color(0, 0, 0));
         words.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
         words.setText("No Account Yet?");
         jPanel1.add(words, new org.netbeans.lib.awtextra.AbsoluteConstraints(340, 250, 220, 20));
 
         titleUser.setFont(new java.awt.Font("Times New Roman", 0, 12)); // NOI18N
-        titleUser.setForeground(new java.awt.Color(255, 255, 255));
+        titleUser.setForeground(new java.awt.Color(0, 0, 0));
         titleUser.setText("Username: ");
         jPanel1.add(titleUser, new org.netbeans.lib.awtextra.AbsoluteConstraints(340, 130, 60, -1));
 
-        fieldUser.setBackground(new java.awt.Color(230, 194, 65));
-        fieldUser.setForeground(new java.awt.Color(255, 255, 255));
+        fieldUser.setBackground(new java.awt.Color(255, 255, 255));
+        fieldUser.setForeground(new java.awt.Color(0, 0, 0));
         fieldUser.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(255, 255, 255)));
         fieldUser.setName(""); // NOI18N
         jPanel1.add(fieldUser, new org.netbeans.lib.awtextra.AbsoluteConstraints(340, 150, 200, -1));
 
         titlePass.setFont(new java.awt.Font("Times New Roman", 0, 12)); // NOI18N
-        titlePass.setForeground(new java.awt.Color(255, 255, 255));
+        titlePass.setForeground(new java.awt.Color(0, 0, 0));
         titlePass.setText("Password: ");
         jPanel1.add(titlePass, new org.netbeans.lib.awtextra.AbsoluteConstraints(340, 170, 60, -1));
 
-        fieldPassword.setBackground(new java.awt.Color(230, 194, 65));
-        fieldPassword.setForeground(new java.awt.Color(255, 255, 255));
+        fieldPassword.setBackground(new java.awt.Color(255, 255, 255));
+        fieldPassword.setForeground(new java.awt.Color(0, 0, 0));
         fieldPassword.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(255, 255, 255)));
         jPanel1.add(fieldPassword, new org.netbeans.lib.awtextra.AbsoluteConstraints(340, 190, 200, 20));
 
-        loginButton.setBackground(new java.awt.Color(230, 194, 65));
+        loginButton.setBackground(new java.awt.Color(0, 0, 0));
         loginButton.setForeground(new java.awt.Color(255, 255, 255));
         loginButton.setText("Login");
         loginButton.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(255, 255, 255)));
@@ -182,11 +189,36 @@ public class formLogin extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void registButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_registButtonActionPerformed
-        // TODO add your handling code here:
+       new formRegister().setVisible(true);
+       dispose(); 
     }//GEN-LAST:event_registButtonActionPerformed
 
     private void loginButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_loginButtonActionPerformed
-        // TODO add your handling code here:
+        
+        String idUser = fieldUser.getText();
+        String password = new String(fieldPassword.getPassword());
+        
+        try (Connection conn = DBConnection.konek()) {
+            String query = "SELECT * FROM pengguna WHERE username = ? AND password = ?";
+            PreparedStatement pstmt = conn.prepareStatement(query);
+            pstmt.setString(1, idUser);
+            pstmt.setString(2, password);
+
+            ResultSet rs = pstmt.executeQuery();
+
+            if (rs.next()) { // Jika ada hasil, login berhasil
+                new mainMenu().setVisible(true);
+                dispose();
+            } else { // Jika tidak ada hasil, login gagal
+                JOptionPane.showMessageDialog(null, "ID atau Password salah!", "Pesan Salah", JOptionPane.ERROR_MESSAGE);
+                fieldUser.setText("");
+                fieldPassword.setText("");
+                fieldUser.requestFocus();
+            }
+        } catch (SQLException | ClassNotFoundException e) {
+            JOptionPane.showMessageDialog(null, "Gagal menghubungkan ke database: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+        }
+        
     }//GEN-LAST:event_loginButtonActionPerformed
 
     private void retryButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_retryButtonActionPerformed
