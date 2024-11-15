@@ -110,29 +110,29 @@ public class formRegister extends javax.swing.JFrame {
         jPanel1.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         Title.setFont(new java.awt.Font("Times New Roman", 1, 24)); // NOI18N
-        Title.setForeground(new java.awt.Color(255, 255, 255));
+        Title.setForeground(new java.awt.Color(0, 0, 0));
         Title.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
         Title.setText("Register Your Future!");
         jPanel1.add(Title, new org.netbeans.lib.awtextra.AbsoluteConstraints(330, 40, 240, 50));
 
         titleUser.setFont(new java.awt.Font("Times New Roman", 0, 12)); // NOI18N
-        titleUser.setForeground(new java.awt.Color(255, 255, 255));
+        titleUser.setForeground(new java.awt.Color(0, 0, 0));
         titleUser.setText("Username: ");
         jPanel1.add(titleUser, new org.netbeans.lib.awtextra.AbsoluteConstraints(330, 130, 60, -1));
 
         TitleNama.setFont(new java.awt.Font("Times New Roman", 0, 12)); // NOI18N
-        TitleNama.setForeground(new java.awt.Color(255, 255, 255));
+        TitleNama.setForeground(new java.awt.Color(0, 0, 0));
         TitleNama.setText("Full Name: ");
         jPanel1.add(TitleNama, new org.netbeans.lib.awtextra.AbsoluteConstraints(330, 90, 60, -1));
 
-        fieldName.setBackground(new java.awt.Color(230, 194, 65));
-        fieldName.setForeground(new java.awt.Color(255, 255, 255));
+        fieldName.setBackground(new java.awt.Color(255, 255, 255));
+        fieldName.setForeground(new java.awt.Color(0, 0, 0));
         fieldName.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(255, 255, 255)));
         fieldName.setName(""); // NOI18N
         jPanel1.add(fieldName, new org.netbeans.lib.awtextra.AbsoluteConstraints(330, 110, 220, -1));
 
-        fieldUser.setBackground(new java.awt.Color(230, 194, 65));
-        fieldUser.setForeground(new java.awt.Color(255, 255, 255));
+        fieldUser.setBackground(new java.awt.Color(255, 255, 255));
+        fieldUser.setForeground(new java.awt.Color(0, 0, 0));
         fieldUser.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(255, 255, 255)));
         fieldUser.setName(""); // NOI18N
         jPanel1.add(fieldUser, new org.netbeans.lib.awtextra.AbsoluteConstraints(330, 150, 220, -1));
@@ -150,23 +150,23 @@ public class formRegister extends javax.swing.JFrame {
         jPanel1.add(registerButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(330, 260, 220, 20));
 
         titlePass.setFont(new java.awt.Font("Times New Roman", 0, 12)); // NOI18N
-        titlePass.setForeground(new java.awt.Color(255, 255, 255));
+        titlePass.setForeground(new java.awt.Color(0, 0, 0));
         titlePass.setText("Password: ");
         jPanel1.add(titlePass, new org.netbeans.lib.awtextra.AbsoluteConstraints(330, 170, 60, -1));
 
-        fieldPass.setBackground(new java.awt.Color(230, 194, 65));
-        fieldPass.setForeground(new java.awt.Color(255, 255, 255));
+        fieldPass.setBackground(new java.awt.Color(255, 255, 255));
+        fieldPass.setForeground(new java.awt.Color(0, 0, 0));
         fieldPass.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(255, 255, 255)));
         fieldPass.setCaretColor(new java.awt.Color(255, 255, 255));
         jPanel1.add(fieldPass, new org.netbeans.lib.awtextra.AbsoluteConstraints(330, 190, 220, 20));
 
         titleConfirmPass.setFont(new java.awt.Font("Times New Roman", 0, 12)); // NOI18N
-        titleConfirmPass.setForeground(new java.awt.Color(255, 255, 255));
+        titleConfirmPass.setForeground(new java.awt.Color(0, 0, 0));
         titleConfirmPass.setText("Confirm Password: ");
         jPanel1.add(titleConfirmPass, new org.netbeans.lib.awtextra.AbsoluteConstraints(330, 210, 100, 20));
 
-        fieldConfirmPass.setBackground(new java.awt.Color(230, 194, 65));
-        fieldConfirmPass.setForeground(new java.awt.Color(255, 255, 255));
+        fieldConfirmPass.setBackground(new java.awt.Color(255, 255, 255));
+        fieldConfirmPass.setForeground(new java.awt.Color(0, 0, 0));
         fieldConfirmPass.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(255, 255, 255)));
         fieldConfirmPass.setCaretColor(new java.awt.Color(255, 255, 255));
         jPanel1.add(fieldConfirmPass, new org.netbeans.lib.awtextra.AbsoluteConstraints(330, 230, 220, 20));
@@ -180,7 +180,9 @@ public class formRegister extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void registerButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_registerButtonActionPerformed
-        // TODO add your handling code here:
+        String namaUser = fieldName.getText();
+        String idUser = fieldUser.getText();
+        String password = new String(fieldPass.getPassword());
     }//GEN-LAST:event_registerButtonActionPerformed
 
     private void loginButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_loginButtonActionPerformed

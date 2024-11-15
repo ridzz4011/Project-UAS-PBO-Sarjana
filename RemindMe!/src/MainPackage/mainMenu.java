@@ -225,17 +225,17 @@ public class mainMenu extends javax.swing.JFrame {
         jPanel1.setBackground(new java.awt.Color(230, 194, 65));
         jPanel1.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
-        deleteButton.setBackground(new java.awt.Color(230, 194, 65));
+        deleteButton.setBackground(new java.awt.Color(255, 255, 255));
         deleteButton.setFont(new java.awt.Font("Times New Roman", 1, 14)); // NOI18N
-        deleteButton.setForeground(new java.awt.Color(255, 255, 255));
+        deleteButton.setForeground(new java.awt.Color(0, 0, 0));
         deleteButton.setText("delete");
         deleteButton.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(255, 255, 255), 5));
         deleteButton.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         jPanel1.add(deleteButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(320, 290, 50, 30));
 
-        saveButton.setBackground(new java.awt.Color(230, 194, 65));
+        saveButton.setBackground(new java.awt.Color(255, 255, 255));
         saveButton.setFont(new java.awt.Font("Times New Roman", 1, 14)); // NOI18N
-        saveButton.setForeground(new java.awt.Color(255, 255, 255));
+        saveButton.setForeground(new java.awt.Color(0, 0, 0));
         saveButton.setText("save");
         saveButton.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(255, 255, 255), 5));
         saveButton.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
@@ -243,49 +243,49 @@ public class mainMenu extends javax.swing.JFrame {
 
         fieldDeadline.setBackground(new java.awt.Color(230, 194, 65));
         fieldDeadline.setFont(new java.awt.Font("Times New Roman", 0, 12)); // NOI18N
-        fieldDeadline.setForeground(new java.awt.Color(255, 255, 255));
+        fieldDeadline.setForeground(new java.awt.Color(0, 0, 0));
         fieldDeadline.setText("2024-11-25");
         fieldDeadline.setBorder(null);
         jPanel1.add(fieldDeadline, new org.netbeans.lib.awtextra.AbsoluteConstraints(90, 70, 340, 20));
 
         fieldTaskName.setBackground(new java.awt.Color(230, 194, 65));
         fieldTaskName.setFont(new java.awt.Font("Times New Roman", 0, 12)); // NOI18N
-        fieldTaskName.setForeground(new java.awt.Color(255, 255, 255));
+        fieldTaskName.setForeground(new java.awt.Color(0, 0, 0));
         fieldTaskName.setText("PBO Task");
         fieldTaskName.setBorder(null);
         jPanel1.add(fieldTaskName, new org.netbeans.lib.awtextra.AbsoluteConstraints(90, 10, 340, 20));
 
         fieldMatkulName.setBackground(new java.awt.Color(230, 194, 65));
         fieldMatkulName.setFont(new java.awt.Font("Times New Roman", 0, 12)); // NOI18N
-        fieldMatkulName.setForeground(new java.awt.Color(255, 255, 255));
+        fieldMatkulName.setForeground(new java.awt.Color(0, 0, 0));
         fieldMatkulName.setText("Pemrograman Beroriantasi Objek");
         fieldMatkulName.setBorder(null);
         jPanel1.add(fieldMatkulName, new org.netbeans.lib.awtextra.AbsoluteConstraints(90, 40, 340, 20));
 
         labelDescription.setFont(new java.awt.Font("Times New Roman", 0, 12)); // NOI18N
-        labelDescription.setForeground(new java.awt.Color(255, 255, 255));
+        labelDescription.setForeground(new java.awt.Color(0, 0, 0));
         labelDescription.setText("Deskripsi: ");
         jPanel1.add(labelDescription, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 100, 80, 20));
 
         labelTugasName.setFont(new java.awt.Font("Times New Roman", 0, 12)); // NOI18N
-        labelTugasName.setForeground(new java.awt.Color(255, 255, 255));
+        labelTugasName.setForeground(new java.awt.Color(0, 0, 0));
         labelTugasName.setText("Nama Tugas: ");
         jPanel1.add(labelTugasName, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 10, 70, 20));
 
         labelMatkulName.setFont(new java.awt.Font("Times New Roman", 0, 12)); // NOI18N
-        labelMatkulName.setForeground(new java.awt.Color(255, 255, 255));
+        labelMatkulName.setForeground(new java.awt.Color(0, 0, 0));
         labelMatkulName.setText("Nama Matkul: ");
         jPanel1.add(labelMatkulName, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 40, 80, 20));
 
         labelDeadline.setFont(new java.awt.Font("Times New Roman", 0, 12)); // NOI18N
-        labelDeadline.setForeground(new java.awt.Color(255, 255, 255));
+        labelDeadline.setForeground(new java.awt.Color(0, 0, 0));
         labelDeadline.setText("Deadline: ");
         jPanel1.add(labelDeadline, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 70, 80, 20));
 
-        textAreaDescription.setBackground(new java.awt.Color(230, 194, 65));
+        textAreaDescription.setBackground(new java.awt.Color(255, 255, 255));
         textAreaDescription.setColumns(20);
         textAreaDescription.setFont(new java.awt.Font("Times New Roman", 0, 12)); // NOI18N
-        textAreaDescription.setForeground(new java.awt.Color(255, 255, 255));
+        textAreaDescription.setForeground(new java.awt.Color(0, 0, 0));
         textAreaDescription.setRows(5);
         textAreaDescription.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(255, 255, 255)));
         jScrollPane1.setViewportView(textAreaDescription);
@@ -298,7 +298,7 @@ public class mainMenu extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void boldButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_boldButtonActionPerformed
-        dateChooser.showPopup();
+        
     }//GEN-LAST:event_boldButtonActionPerformed
 
     private void userButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_userButtonActionPerformed
@@ -306,7 +306,7 @@ public class mainMenu extends javax.swing.JFrame {
     }//GEN-LAST:event_userButtonActionPerformed
 
     private void kalenderButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_kalenderButtonActionPerformed
-        // TODO add your handling code here:
+        dateChooser.showPopup();
     }//GEN-LAST:event_kalenderButtonActionPerformed
 
     private void italicButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_italicButtonActionPerformed
