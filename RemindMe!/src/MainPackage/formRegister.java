@@ -4,6 +4,12 @@
  */
 package MainPackage;
 
+import DatabaseConnection.DBConnection;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import javax.swing.JOptionPane;
+
 /**
  *
  * @author soery
@@ -183,6 +189,43 @@ public class formRegister extends javax.swing.JFrame {
         String namaUser = fieldName.getText();
         String idUser = fieldUser.getText();
         String password = new String(fieldPass.getPassword());
+        String confirmPassword = new String(fieldPass.getPassword());
+        
+        if(!confirmPassword.equals(password)) {
+            JOptionPane.showMessageDialog(null, "Konfirmasi Password tidak Sesuai", "Pesan Salah", JOptionPane.ERROR_MESSAGE);
+            fieldConfirmPass.setText("");
+            fieldName.requestFocus();
+        } else {
+            try (Connection conn = DBConnection.konek()) {
+                String query = "INSERT INTO pengguna (namaPengguna, username, password)" +
+                        "VALUES (?, ?, ?)";
+                
+                PreparedStatement pstmt = conn.prepareStatement(query);
+
+                // Set nilai parameter query
+                pstmt.setString(1, namaUser);
+                pstmt.setString(2, idUser);
+                pstmt.setString(3, password);
+
+                int resultSet = pstmt.executeUpdate();
+
+                if (resultSet > 0) { // Jika ada hasil, registrasi berhasil
+                    new formLogin().setVisible(true);
+                    dispose();
+                } else { // Jika tidak ada hasil, login gagal
+                    JOptionPane.showMessageDialog(null, "ID atau Password salah!", "Pesan Salah", JOptionPane.ERROR_MESSAGE);
+                    fieldName.setText("");
+                    fieldUser.setText("");
+                    fieldPass.setText("");
+                    fieldConfirmPass.setText("");
+                    fieldName.requestFocus();
+                }
+                
+            } catch (SQLException | ClassNotFoundException e) {
+                JOptionPane.showMessageDialog(null, "Gagal menghubungkan ke database: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        }
+        
     }//GEN-LAST:event_registerButtonActionPerformed
 
     private void loginButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_loginButtonActionPerformed
