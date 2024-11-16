@@ -189,12 +189,12 @@ public class formRegister extends javax.swing.JFrame {
         String namaUser = fieldName.getText();
         String idUser = fieldUser.getText();
         String password = new String(fieldPass.getPassword());
-        String confirmPassword = new String(fieldPass.getPassword());
+        String confirmPassword = new String(fieldConfirmPass.getPassword());
         
         if(!confirmPassword.equals(password)) {
             JOptionPane.showMessageDialog(null, "Konfirmasi Password tidak Sesuai", "Pesan Salah", JOptionPane.ERROR_MESSAGE);
             fieldConfirmPass.setText("");
-            fieldName.requestFocus();
+            fieldConfirmPass.requestFocus();
         } else {
             try (Connection conn = DBConnection.konek()) {
                 String query = "INSERT INTO pengguna (namaPengguna, username, password)" +
