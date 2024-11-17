@@ -1,0 +1,13 @@
+Jurnal kemsis
+
+judul & abstract
+pendahuluan
+metode
+langkah
+analisis cvss (klo bisa beberapa kali percobaan terus analisis)
+kesimpulan
+saran
+ucapan terimakasih
+daftar pustaka
+
+link ref : https://jurnal.fikom.umi.ac.id/index.php/ILKOM/article/view/311;/0 
