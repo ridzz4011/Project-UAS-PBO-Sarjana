@@ -26,7 +26,6 @@ public class mainMenu extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        dateChooser = new com.raven.datechooser.DateChooser();
         sideBar = new javax.swing.JPanel();
         jScrollPane2 = new javax.swing.JScrollPane();
         jPanel2 = new javax.swing.JPanel();
@@ -53,8 +52,6 @@ public class mainMenu extends javax.swing.JFrame {
         labelDeadline = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
         textAreaDescription = new javax.swing.JTextArea();
-
-        dateChooser.setForeground(new java.awt.Color(230, 194, 65));
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
@@ -374,7 +371,6 @@ public class mainMenu extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton boldButton;
     private javax.swing.JButton buttonAddTask;
-    private com.raven.datechooser.DateChooser dateChooser;
     private javax.swing.JButton deleteButton;
     private javax.swing.JButton exampleTaskList;
     private javax.swing.JButton exampleTaskList2;
