@@ -5,4 +5,5 @@ interface Sistem_Function_Interface {
     public abstract void edit_Tugas();
     public abstract void hapus_Tugas();
     public abstract void set_Reminder();
+    public abstract void tambah_Tugas();
 }

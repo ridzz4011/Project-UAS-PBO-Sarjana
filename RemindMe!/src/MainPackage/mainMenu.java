@@ -29,10 +29,8 @@ public class mainMenu extends javax.swing.JFrame {
         dateChooser = new com.raven.datechooser.DateChooser();
         sideBar = new javax.swing.JPanel();
         jScrollPane2 = new javax.swing.JScrollPane();
-        jPanel2 = new javax.swing.JPanel();
+        panelTask = new javax.swing.JPanel();
         buttonAddTask = new javax.swing.JButton();
-        exampleTaskList = new javax.swing.JButton();
-        exampleTaskList2 = new javax.swing.JButton();
         sortingButton = new javax.swing.JButton();
         navBar = new javax.swing.JPanel();
         userButton = new javax.swing.JButton();
@@ -61,59 +59,47 @@ public class mainMenu extends javax.swing.JFrame {
 
         sideBar.setBackground(new java.awt.Color(255, 255, 255));
 
-        jPanel2.setBackground(new java.awt.Color(255, 255, 255));
+        panelTask.setBackground(new java.awt.Color(255, 255, 255));
+        panelTask.addPropertyChangeListener(new java.beans.PropertyChangeListener() {
+            public void propertyChange(java.beans.PropertyChangeEvent evt) {
+                panelTaskPropertyChange(evt);
+            }
+        });
 
         buttonAddTask.setBackground(new java.awt.Color(230, 194, 65));
         buttonAddTask.setFont(new java.awt.Font("Times New Roman", 0, 12)); // NOI18N
         buttonAddTask.setForeground(new java.awt.Color(255, 255, 255));
         buttonAddTask.setText("Add New Task");
 
-        exampleTaskList.setFont(new java.awt.Font("Times New Roman", 0, 12)); // NOI18N
-        exampleTaskList.setForeground(new java.awt.Color(230, 194, 65));
-        exampleTaskList.setText("PBO Task");
-        exampleTaskList.setBorder(null);
-
-        exampleTaskList2.setFont(new java.awt.Font("Times New Roman", 0, 12)); // NOI18N
-        exampleTaskList2.setForeground(new java.awt.Color(230, 194, 65));
-        exampleTaskList2.setText("UAS Project Database");
-        exampleTaskList2.setBorder(null);
-
         sortingButton.setBackground(new java.awt.Color(230, 194, 65));
         sortingButton.setFont(new java.awt.Font("Times New Roman", 0, 12)); // NOI18N
         sortingButton.setForeground(new java.awt.Color(255, 255, 255));
         sortingButton.setText("Sort By...");
 
-        javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
-        jPanel2.setLayout(jPanel2Layout);
-        jPanel2Layout.setHorizontalGroup(
-            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel2Layout.createSequentialGroup()
+        javax.swing.GroupLayout panelTaskLayout = new javax.swing.GroupLayout(panelTask);
+        panelTask.setLayout(panelTaskLayout);
+        panelTaskLayout.setHorizontalGroup(
+            panelTaskLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(panelTaskLayout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel2Layout.createSequentialGroup()
-                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                            .addComponent(exampleTaskList2, javax.swing.GroupLayout.DEFAULT_SIZE, 171, Short.MAX_VALUE)
-                            .addComponent(buttonAddTask, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(exampleTaskList, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                        .addGap(0, 0, Short.MAX_VALUE))
-                    .addComponent(sortingButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addGroup(panelTaskLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(sortingButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addGroup(panelTaskLayout.createSequentialGroup()
+                        .addComponent(buttonAddTask, javax.swing.GroupLayout.PREFERRED_SIZE, 171, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(0, 0, Short.MAX_VALUE)))
                 .addContainerGap())
         );
-        jPanel2Layout.setVerticalGroup(
-            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
+        panelTaskLayout.setVerticalGroup(
+            panelTaskLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panelTaskLayout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(buttonAddTask)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(exampleTaskList, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(exampleTaskList2, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 218, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 279, Short.MAX_VALUE)
                 .addComponent(sortingButton)
                 .addContainerGap())
         );
 
-        jScrollPane2.setViewportView(jPanel2);
+        jScrollPane2.setViewportView(panelTask);
 
         javax.swing.GroupLayout sideBarLayout = new javax.swing.GroupLayout(sideBar);
         sideBar.setLayout(sideBarLayout);
@@ -225,17 +211,13 @@ public class mainMenu extends javax.swing.JFrame {
         jPanel1.setBackground(new java.awt.Color(230, 194, 65));
         jPanel1.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
-        deleteButton.setBackground(new java.awt.Color(255, 255, 255));
         deleteButton.setFont(new java.awt.Font("Times New Roman", 1, 14)); // NOI18N
-        deleteButton.setForeground(new java.awt.Color(0, 0, 0));
         deleteButton.setText("delete");
         deleteButton.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(255, 255, 255), 5));
         deleteButton.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         jPanel1.add(deleteButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(320, 290, 50, 30));
 
-        saveButton.setBackground(new java.awt.Color(255, 255, 255));
         saveButton.setFont(new java.awt.Font("Times New Roman", 1, 14)); // NOI18N
-        saveButton.setForeground(new java.awt.Color(0, 0, 0));
         saveButton.setText("save");
         saveButton.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(255, 255, 255), 5));
         saveButton.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
@@ -243,49 +225,40 @@ public class mainMenu extends javax.swing.JFrame {
 
         fieldDeadline.setBackground(new java.awt.Color(230, 194, 65));
         fieldDeadline.setFont(new java.awt.Font("Times New Roman", 0, 12)); // NOI18N
-        fieldDeadline.setForeground(new java.awt.Color(0, 0, 0));
         fieldDeadline.setText("2024-11-25");
         fieldDeadline.setBorder(null);
         jPanel1.add(fieldDeadline, new org.netbeans.lib.awtextra.AbsoluteConstraints(90, 70, 340, 20));
 
         fieldTaskName.setBackground(new java.awt.Color(230, 194, 65));
         fieldTaskName.setFont(new java.awt.Font("Times New Roman", 0, 12)); // NOI18N
-        fieldTaskName.setForeground(new java.awt.Color(0, 0, 0));
         fieldTaskName.setText("PBO Task");
         fieldTaskName.setBorder(null);
         jPanel1.add(fieldTaskName, new org.netbeans.lib.awtextra.AbsoluteConstraints(90, 10, 340, 20));
 
         fieldMatkulName.setBackground(new java.awt.Color(230, 194, 65));
         fieldMatkulName.setFont(new java.awt.Font("Times New Roman", 0, 12)); // NOI18N
-        fieldMatkulName.setForeground(new java.awt.Color(0, 0, 0));
         fieldMatkulName.setText("Pemrograman Beroriantasi Objek");
         fieldMatkulName.setBorder(null);
         jPanel1.add(fieldMatkulName, new org.netbeans.lib.awtextra.AbsoluteConstraints(90, 40, 340, 20));
 
         labelDescription.setFont(new java.awt.Font("Times New Roman", 0, 12)); // NOI18N
-        labelDescription.setForeground(new java.awt.Color(0, 0, 0));
         labelDescription.setText("Deskripsi: ");
         jPanel1.add(labelDescription, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 100, 80, 20));
 
         labelTugasName.setFont(new java.awt.Font("Times New Roman", 0, 12)); // NOI18N
-        labelTugasName.setForeground(new java.awt.Color(0, 0, 0));
         labelTugasName.setText("Nama Tugas: ");
         jPanel1.add(labelTugasName, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 10, 70, 20));
 
         labelMatkulName.setFont(new java.awt.Font("Times New Roman", 0, 12)); // NOI18N
-        labelMatkulName.setForeground(new java.awt.Color(0, 0, 0));
         labelMatkulName.setText("Nama Matkul: ");
         jPanel1.add(labelMatkulName, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 40, 80, 20));
 
         labelDeadline.setFont(new java.awt.Font("Times New Roman", 0, 12)); // NOI18N
-        labelDeadline.setForeground(new java.awt.Color(0, 0, 0));
         labelDeadline.setText("Deadline: ");
         jPanel1.add(labelDeadline, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 70, 80, 20));
 
-        textAreaDescription.setBackground(new java.awt.Color(255, 255, 255));
         textAreaDescription.setColumns(20);
         textAreaDescription.setFont(new java.awt.Font("Times New Roman", 0, 12)); // NOI18N
-        textAreaDescription.setForeground(new java.awt.Color(0, 0, 0));
         textAreaDescription.setRows(5);
         textAreaDescription.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(255, 255, 255)));
         jScrollPane1.setViewportView(textAreaDescription);
@@ -320,6 +293,11 @@ public class mainMenu extends javax.swing.JFrame {
     private void strikeoutButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_strikeoutButtonActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_strikeoutButtonActionPerformed
+
+    private void panelTaskPropertyChange(java.beans.PropertyChangeEvent evt) {//GEN-FIRST:event_panelTaskPropertyChange
+        // TODO add your handling code here:
+        
+    }//GEN-LAST:event_panelTaskPropertyChange
 
     /**
      * @param args the command line arguments
@@ -376,14 +354,11 @@ public class mainMenu extends javax.swing.JFrame {
     private javax.swing.JButton buttonAddTask;
     private com.raven.datechooser.DateChooser dateChooser;
     private javax.swing.JButton deleteButton;
-    private javax.swing.JButton exampleTaskList;
-    private javax.swing.JButton exampleTaskList2;
     private javax.swing.JTextField fieldDeadline;
     private javax.swing.JTextField fieldMatkulName;
     private javax.swing.JTextField fieldTaskName;
     private javax.swing.JButton italicButton;
     private javax.swing.JPanel jPanel1;
-    private javax.swing.JPanel jPanel2;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JButton kalenderButton;
@@ -392,6 +367,7 @@ public class mainMenu extends javax.swing.JFrame {
     private javax.swing.JLabel labelMatkulName;
     private javax.swing.JLabel labelTugasName;
     private javax.swing.JPanel navBar;
+    public javax.swing.JPanel panelTask;
     private javax.swing.JButton saveButton;
     private javax.swing.JPanel sideBar;
     private javax.swing.JButton sortingButton;

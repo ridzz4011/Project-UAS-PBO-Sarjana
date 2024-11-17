@@ -210,6 +210,7 @@ public class formRegister extends javax.swing.JFrame {
                 int resultSet = pstmt.executeUpdate();
 
                 if (resultSet > 0) { // Jika ada hasil, registrasi berhasil
+                    JOptionPane.showMessageDialog(null, "Akun berhasil dibuat!", "Registrasi Berhasil!", JOptionPane.ERROR_MESSAGE);
                     new formLogin().setVisible(true);
                     dispose();
                 } else { // Jika tidak ada hasil, login gagal
@@ -261,10 +262,8 @@ public class formRegister extends javax.swing.JFrame {
         //</editor-fold>
 
         /* Create and display the form */
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                new formRegister().setVisible(true);
-            }
+        java.awt.EventQueue.invokeLater(() -> {
+            new formRegister().setVisible(true);
         });
     }
 

@@ -13,7 +13,7 @@ public class DBConnection {
         try {
             if (konek == null || konek.isClosed()) {
                     Class.forName(JDBC_DRIVER);
-                    konek = DriverManager.getConnection("jdbc:mysql://localhost/remindme!", "root", "");
+                    konek = DriverManager.getConnection("jdbc:mysql://localhost/remindme", "root", "");
                     System.out.println("Koneksi Berhasil Dibuka");
                 } else {
                     System.out.println("Menggunakan Koneksi yang Sudah Ada");
