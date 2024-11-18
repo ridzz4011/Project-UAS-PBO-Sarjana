@@ -210,6 +210,7 @@ public class formRegister extends javax.swing.JFrame {
                 int resultSet = pstmt.executeUpdate();
 
                 if (resultSet > 0) { // Jika ada hasil, registrasi berhasil
+                    JOptionPane.showMessageDialog(null, "Registrasi Akun berhasil, kembali ke page login");
                     new formLogin().setVisible(true);
                     dispose();
                 } else { // Jika tidak ada hasil, login gagal

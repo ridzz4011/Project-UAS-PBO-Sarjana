@@ -16,7 +16,7 @@ import javax.swing.JOptionPane;
  * @author soery
  */
 public class formLogin extends javax.swing.JFrame {
-
+    
     /**
      * Creates new form formLogin
      */
@@ -207,7 +207,9 @@ public class formLogin extends javax.swing.JFrame {
             ResultSet rs = pstmt.executeQuery();
 
             if (rs.next()) { // Jika ada hasil, login berhasil
-                new mainMenu().setVisible(true);
+                String currentUser = idUser; // Ambil username dari database
+                mainMenu mainMenuPage = new mainMenu(currentUser); // Kirim currentUser ke Main Menu
+                mainMenuPage.setVisible(true);
                 dispose();
             } else { // Jika tidak ada hasil, login gagal
                 JOptionPane.showMessageDialog(null, "ID atau Password salah!", "Pesan Salah", JOptionPane.ERROR_MESSAGE);
