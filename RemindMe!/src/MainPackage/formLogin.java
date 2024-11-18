@@ -161,7 +161,7 @@ public class formLogin extends javax.swing.JFrame {
         fieldPassword.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(255, 255, 255)));
         jPanel1.add(fieldPassword, new org.netbeans.lib.awtextra.AbsoluteConstraints(340, 190, 200, 20));
 
-        loginButton.setBackground(new java.awt.Color(230, 194, 65));
+        loginButton.setBackground(new java.awt.Color(0, 0, 0));
         loginButton.setForeground(new java.awt.Color(255, 255, 255));
         loginButton.setText("Login");
         loginButton.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(255, 255, 255)));
@@ -174,7 +174,7 @@ public class formLogin extends javax.swing.JFrame {
         jPanel1.add(loginButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(340, 220, 200, 20));
 
         BGLogin.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/1.png"))); // NOI18N
-        jPanel1.add(BGLogin, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 610, -1));
+        jPanel1.add(BGLogin, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 600, -1));
 
         getContentPane().add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 610, 340));
 
@@ -204,7 +204,7 @@ public class formLogin extends javax.swing.JFrame {
          */
         try {
             for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
+                if ("windows".equals(info.getName())) {
                     javax.swing.UIManager.setLookAndFeel(info.getClassName());
                     break;
                 }

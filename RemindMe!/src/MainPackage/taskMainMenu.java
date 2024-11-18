@@ -8,12 +8,12 @@ package MainPackage;
  *
  * @author soery
  */
-public class mainMenu extends javax.swing.JFrame {
+public class taskMainMenu extends javax.swing.JFrame {
 
     /**
      * Creates new form formLogin
      */
-    public mainMenu() {
+    public taskMainMenu() {
         initComponents();
     }
 
@@ -26,6 +26,7 @@ public class mainMenu extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        dateChooser = new com.raven.datechooser.DateChooser();
         sideBar = new javax.swing.JPanel();
         jScrollPane2 = new javax.swing.JScrollPane();
         jPanel2 = new javax.swing.JPanel();
@@ -37,13 +38,20 @@ public class mainMenu extends javax.swing.JFrame {
         userButton = new javax.swing.JButton();
         kalenderButton = new javax.swing.JButton();
         jPanel1 = new javax.swing.JPanel();
-        labelTitle = new javax.swing.JLabel();
-        labelTitle1 = new javax.swing.JLabel();
-        labelTitle2 = new javax.swing.JLabel();
-        labelTitle3 = new javax.swing.JLabel();
-        labelTitle4 = new javax.swing.JLabel();
-        labelTitle5 = new javax.swing.JLabel();
-        labelTitle6 = new javax.swing.JLabel();
+        reminderButton = new javax.swing.JButton();
+        saveButton = new javax.swing.JButton();
+        fieldDeadline = new javax.swing.JTextField();
+        fieldTaskName = new javax.swing.JTextField();
+        fieldMatkulName = new javax.swing.JTextField();
+        labelDescription = new javax.swing.JLabel();
+        labelTugasName = new javax.swing.JLabel();
+        labelMatkulName = new javax.swing.JLabel();
+        labelDeadline = new javax.swing.JLabel();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        textAreaDescription = new javax.swing.JTextArea();
+        deleteButton1 = new javax.swing.JButton();
+
+        dateChooser.setForeground(new java.awt.Color(230, 194, 65));
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
@@ -166,40 +174,85 @@ public class mainMenu extends javax.swing.JFrame {
         jPanel1.setBackground(new java.awt.Color(230, 194, 65));
         jPanel1.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
-        labelTitle.setFont(new java.awt.Font("Times New Roman", 0, 12)); // NOI18N
-        labelTitle.setForeground(new java.awt.Color(255, 255, 255));
-        labelTitle.setText("4. Mengurutkan Tugas ");
-        jPanel1.add(labelTitle, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 190, 230, -1));
+        reminderButton.setBackground(new java.awt.Color(230, 194, 65));
+        reminderButton.setFont(new java.awt.Font("Times New Roman", 1, 14)); // NOI18N
+        reminderButton.setForeground(new java.awt.Color(255, 255, 255));
+        reminderButton.setText("Set Reminder");
+        reminderButton.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(255, 255, 255), 5));
+        reminderButton.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        jPanel1.add(reminderButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(90, 290, 130, 30));
 
-        labelTitle1.setFont(new java.awt.Font("Times New Roman", 1, 36)); // NOI18N
-        labelTitle1.setForeground(new java.awt.Color(255, 255, 255));
-        labelTitle1.setText("Remind Me!");
-        jPanel1.add(labelTitle1, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 20, 230, 60));
+        saveButton.setBackground(new java.awt.Color(230, 194, 65));
+        saveButton.setFont(new java.awt.Font("Times New Roman", 1, 14)); // NOI18N
+        saveButton.setForeground(new java.awt.Color(255, 255, 255));
+        saveButton.setText("Save");
+        saveButton.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(255, 255, 255), 5));
+        saveButton.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        jPanel1.add(saveButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(380, 290, 50, 30));
 
-        labelTitle2.setFont(new java.awt.Font("Times New Roman", 0, 12)); // NOI18N
-        labelTitle2.setForeground(new java.awt.Color(255, 255, 255));
-        labelTitle2.setText("Remind Me! adalah aplikasi yang dirancang untuk membantu mahasiswa ");
-        jPanel1.add(labelTitle2, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 90, 360, -1));
+        fieldDeadline.setBackground(new java.awt.Color(230, 194, 65));
+        fieldDeadline.setFont(new java.awt.Font("Times New Roman", 0, 12)); // NOI18N
+        fieldDeadline.setForeground(new java.awt.Color(255, 255, 255));
+        fieldDeadline.setText("2024-11-25");
+        fieldDeadline.setBorder(null);
+        jPanel1.add(fieldDeadline, new org.netbeans.lib.awtextra.AbsoluteConstraints(90, 70, 340, 20));
 
-        labelTitle3.setFont(new java.awt.Font("Times New Roman", 0, 12)); // NOI18N
-        labelTitle3.setForeground(new java.awt.Color(255, 255, 255));
-        labelTitle3.setText("1. Mencatat Detail Tugas");
-        jPanel1.add(labelTitle3, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 130, 230, -1));
+        fieldTaskName.setBackground(new java.awt.Color(230, 194, 65));
+        fieldTaskName.setFont(new java.awt.Font("Times New Roman", 0, 12)); // NOI18N
+        fieldTaskName.setForeground(new java.awt.Color(255, 255, 255));
+        fieldTaskName.setText("PBO Task");
+        fieldTaskName.setBorder(null);
+        fieldTaskName.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                fieldTaskNameActionPerformed(evt);
+            }
+        });
+        jPanel1.add(fieldTaskName, new org.netbeans.lib.awtextra.AbsoluteConstraints(90, 10, 340, 20));
 
-        labelTitle4.setFont(new java.awt.Font("Times New Roman", 0, 12)); // NOI18N
-        labelTitle4.setForeground(new java.awt.Color(255, 255, 255));
-        labelTitle4.setText("2. Menampilkan Kalender Tugas");
-        jPanel1.add(labelTitle4, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 150, 230, -1));
+        fieldMatkulName.setBackground(new java.awt.Color(230, 194, 65));
+        fieldMatkulName.setFont(new java.awt.Font("Times New Roman", 0, 12)); // NOI18N
+        fieldMatkulName.setForeground(new java.awt.Color(255, 255, 255));
+        fieldMatkulName.setText("Pemrograman Beroriantasi Objek");
+        fieldMatkulName.setBorder(null);
+        jPanel1.add(fieldMatkulName, new org.netbeans.lib.awtextra.AbsoluteConstraints(90, 40, 340, 20));
 
-        labelTitle5.setFont(new java.awt.Font("Times New Roman", 0, 12)); // NOI18N
-        labelTitle5.setForeground(new java.awt.Color(255, 255, 255));
-        labelTitle5.setText("3. Memberikan Notifikati Berdasarkan Deadline");
-        jPanel1.add(labelTitle5, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 170, 230, -1));
+        labelDescription.setFont(new java.awt.Font("Times New Roman", 0, 12)); // NOI18N
+        labelDescription.setForeground(new java.awt.Color(255, 255, 255));
+        labelDescription.setText("Deskripsi: ");
+        jPanel1.add(labelDescription, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 100, 80, 20));
 
-        labelTitle6.setFont(new java.awt.Font("Times New Roman", 0, 12)); // NOI18N
-        labelTitle6.setForeground(new java.awt.Color(255, 255, 255));
-        labelTitle6.setText("mengelola tugas dengan lebih mudah. Aplikasi ini dapat:");
-        jPanel1.add(labelTitle6, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 110, 290, -1));
+        labelTugasName.setFont(new java.awt.Font("Times New Roman", 0, 12)); // NOI18N
+        labelTugasName.setForeground(new java.awt.Color(255, 255, 255));
+        labelTugasName.setText("Nama Tugas: ");
+        jPanel1.add(labelTugasName, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 10, 70, 20));
+
+        labelMatkulName.setFont(new java.awt.Font("Times New Roman", 0, 12)); // NOI18N
+        labelMatkulName.setForeground(new java.awt.Color(255, 255, 255));
+        labelMatkulName.setText("Nama Matkul: ");
+        jPanel1.add(labelMatkulName, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 40, 80, 20));
+
+        labelDeadline.setFont(new java.awt.Font("Times New Roman", 0, 12)); // NOI18N
+        labelDeadline.setForeground(new java.awt.Color(255, 255, 255));
+        labelDeadline.setText("Deadline: ");
+        jPanel1.add(labelDeadline, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 70, 80, 20));
+
+        textAreaDescription.setBackground(new java.awt.Color(230, 194, 65));
+        textAreaDescription.setColumns(20);
+        textAreaDescription.setFont(new java.awt.Font("Times New Roman", 0, 12)); // NOI18N
+        textAreaDescription.setForeground(new java.awt.Color(255, 255, 255));
+        textAreaDescription.setRows(5);
+        textAreaDescription.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(255, 255, 255)));
+        jScrollPane1.setViewportView(textAreaDescription);
+
+        jPanel1.add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(90, 100, 340, 180));
+
+        deleteButton1.setBackground(new java.awt.Color(230, 194, 65));
+        deleteButton1.setFont(new java.awt.Font("Times New Roman", 1, 14)); // NOI18N
+        deleteButton1.setForeground(new java.awt.Color(255, 255, 255));
+        deleteButton1.setText("Delete");
+        deleteButton1.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(255, 255, 255), 5));
+        deleteButton1.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        jPanel1.add(deleteButton1, new org.netbeans.lib.awtextra.AbsoluteConstraints(320, 290, 50, 30));
 
         getContentPane().add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(190, 40, 450, 330));
 
@@ -213,6 +266,10 @@ public class mainMenu extends javax.swing.JFrame {
     private void kalenderButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_kalenderButtonActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_kalenderButtonActionPerformed
+
+    private void fieldTaskNameActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_fieldTaskNameActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_fieldTaskNameActionPerformed
 
     /**
      * @param args the command line arguments
@@ -231,46 +288,14 @@ public class mainMenu extends javax.swing.JFrame {
                 }
             }
         } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(mainMenu.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(taskMainMenu.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(mainMenu.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(taskMainMenu.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(mainMenu.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(taskMainMenu.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(mainMenu.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(taskMainMenu.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
         //</editor-fold>
         //</editor-fold>
         //</editor-fold>
@@ -307,7 +332,7 @@ public class mainMenu extends javax.swing.JFrame {
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new mainMenu().setVisible(true);
+                new taskMainMenu().setVisible(true);
             }
         });
     }
@@ -315,22 +340,27 @@ public class mainMenu extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton buttonAddTask;
     private com.raven.datechooser.DateChooser dateChooser;
+    private javax.swing.JButton deleteButton1;
     private javax.swing.JButton exampleTaskList;
     private javax.swing.JButton exampleTaskList2;
+    private javax.swing.JTextField fieldDeadline;
+    private javax.swing.JTextField fieldMatkulName;
+    private javax.swing.JTextField fieldTaskName;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
+    private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JButton kalenderButton;
-    private javax.swing.JLabel labelTitle;
-    private javax.swing.JLabel labelTitle1;
-    private javax.swing.JLabel labelTitle2;
-    private javax.swing.JLabel labelTitle3;
-    private javax.swing.JLabel labelTitle4;
-    private javax.swing.JLabel labelTitle5;
-    private javax.swing.JLabel labelTitle6;
+    private javax.swing.JLabel labelDeadline;
+    private javax.swing.JLabel labelDescription;
+    private javax.swing.JLabel labelMatkulName;
+    private javax.swing.JLabel labelTugasName;
     private javax.swing.JPanel navBar;
+    private javax.swing.JButton reminderButton;
+    private javax.swing.JButton saveButton;
     private javax.swing.JPanel sideBar;
     private javax.swing.JButton sortingButton;
+    private javax.swing.JTextArea textAreaDescription;
     private javax.swing.JButton userButton;
     // End of variables declaration//GEN-END:variables
 }
