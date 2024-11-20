@@ -7,6 +7,7 @@ package MainPackage;
 import DatabaseConnection.DBConnection;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import javax.swing.JOptionPane;
 
@@ -16,9 +17,8 @@ import javax.swing.JOptionPane;
  */
 public class formRegister extends javax.swing.JFrame {
 
-    /**
-     * Creates new form formLogin
-     */
+    boolean availability = false;
+    
     public formRegister() {
         initComponents();
     }
@@ -42,6 +42,7 @@ public class formRegister extends javax.swing.JFrame {
         titleUser = new javax.swing.JLabel();
         TitleNama = new javax.swing.JLabel();
         fieldName = new javax.swing.JTextField();
+        checkAvailabilityButton = new javax.swing.JButton();
         fieldUser = new javax.swing.JTextField();
         registerButton = new javax.swing.JButton();
         titlePass = new javax.swing.JLabel();
@@ -137,6 +138,15 @@ public class formRegister extends javax.swing.JFrame {
         fieldName.setName(""); // NOI18N
         jPanel1.add(fieldName, new org.netbeans.lib.awtextra.AbsoluteConstraints(330, 110, 220, -1));
 
+        checkAvailabilityButton.setBackground(new java.awt.Color(0, 153, 0));
+        checkAvailabilityButton.setText("✔");
+        checkAvailabilityButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                checkAvailabilityButtonActionPerformed(evt);
+            }
+        });
+        jPanel1.add(checkAvailabilityButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(520, 140, 40, 40));
+
         fieldUser.setBackground(new java.awt.Color(255, 255, 255));
         fieldUser.setForeground(new java.awt.Color(0, 0, 0));
         fieldUser.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(255, 255, 255)));
@@ -191,47 +201,77 @@ public class formRegister extends javax.swing.JFrame {
         String password = new String(fieldPass.getPassword());
         String confirmPassword = new String(fieldConfirmPass.getPassword());
         
-        if(!confirmPassword.equals(password)) {
-            JOptionPane.showMessageDialog(null, "Konfirmasi Password tidak Sesuai", "Pesan Salah", JOptionPane.ERROR_MESSAGE);
-            fieldConfirmPass.setText("");
-            fieldConfirmPass.requestFocus();
-        } else {
-            try (Connection conn = DBConnection.konek()) {
-                String query = "INSERT INTO pengguna (namaPengguna, username, password)" +
-                        "VALUES (?, ?, ?)";
-                
-                PreparedStatement pstmt = conn.prepareStatement(query);
+        if(availability == true) {
+            if(!confirmPassword.equals(password)) {
+                JOptionPane.showMessageDialog(null, "Konfirmasi Password tidak Sesuai", "Pesan Salah", JOptionPane.ERROR_MESSAGE);
+                fieldConfirmPass.setText("");
+                fieldConfirmPass.requestFocus();
+            } else {
+                try (Connection conn = DBConnection.konek()) {
+                    String query = "INSERT INTO pengguna (namaPengguna, username, password)" +
+                            "VALUES (?, ?, ?)";
 
-                // Set nilai parameter query
-                pstmt.setString(1, namaUser);
-                pstmt.setString(2, idUser);
-                pstmt.setString(3, password);
+                    PreparedStatement pstmt = conn.prepareStatement(query);
 
-                int resultSet = pstmt.executeUpdate();
+                    // Set nilai parameter query
+                    pstmt.setString(1, namaUser);
+                    pstmt.setString(2, idUser);
+                    pstmt.setString(3, password);
 
-                if (resultSet > 0) { // Jika ada hasil, registrasi berhasil
-                    JOptionPane.showMessageDialog(null, "Registrasi Akun berhasil, kembali ke page login");
-                    new formLogin().setVisible(true);
-                    dispose();
-                } else { // Jika tidak ada hasil, login gagal
-                    JOptionPane.showMessageDialog(null, "ID atau Password salah!", "Pesan Salah", JOptionPane.ERROR_MESSAGE);
-                    fieldName.setText("");
-                    fieldUser.setText("");
-                    fieldPass.setText("");
-                    fieldConfirmPass.setText("");
-                    fieldName.requestFocus();
+                    int resultSet = pstmt.executeUpdate();
+
+                    if (resultSet > 0) { // Jika ada hasil, registrasi berhasil
+                        JOptionPane.showMessageDialog(null, "Registrasi Akun berhasil, kembali ke page login");
+                        new formLogin().setVisible(true);
+                        dispose();
+                    } else { // Jika tidak ada hasil, login gagal
+                        JOptionPane.showMessageDialog(null, "ID atau Password salah!", "Pesan Salah", JOptionPane.ERROR_MESSAGE);
+                        fieldName.setText("");
+                        fieldUser.setText("");
+                        fieldPass.setText("");
+                        fieldConfirmPass.setText("");
+                        fieldName.requestFocus();
+                    }
+
+                } catch (SQLException | ClassNotFoundException e) {
+                    JOptionPane.showMessageDialog(null, "Gagal menghubungkan ke database: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
                 }
-                
-            } catch (SQLException | ClassNotFoundException e) {
-                JOptionPane.showMessageDialog(null, "Gagal menghubungkan ke database: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
             }
+        } else {
+            JOptionPane.showMessageDialog(null, "Check Ketersediaan Username dulu atau Username anda Sudah terpakai");
         }
-        
+
     }//GEN-LAST:event_registerButtonActionPerformed
 
     private void loginButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_loginButtonActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_loginButtonActionPerformed
+
+    private void checkAvailabilityButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_checkAvailabilityButtonActionPerformed
+        String idUser = fieldUser.getText();
+        
+        try (Connection conn = DBConnection.konek()) {
+            String query = ("SELECT * FROM pengguna WHERE namaPengguna = ?");
+            PreparedStatement pstmt = conn.prepareStatement(query);
+            
+            pstmt.setString(1, idUser);
+            ResultSet rs = pstmt.executeQuery();
+            
+            if (rs.next()) {
+                JOptionPane.showMessageDialog(null, "Username ini sudah dipakai, coba lagi");
+                checkAvailabilityButton.setBackground(new java.awt.Color(153, 0, 0));
+                checkAvailabilityButton.setText("✖");
+                fieldUser.setText("");
+            } else {
+                JOptionPane.showMessageDialog(null, "Username ini Tersedia, lanjutkan Registrasi");
+                checkAvailabilityButton.setBackground(new java.awt.Color(0, 153, 0));
+                checkAvailabilityButton.setText("✔");
+                availability = true;
+            }
+        } catch (SQLException | ClassNotFoundException e) {
+                JOptionPane.showMessageDialog(null, "Gagal menghubungkan ke database: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }//GEN-LAST:event_checkAvailabilityButtonActionPerformed
 
     /**
      * @param args the command line arguments
@@ -273,6 +313,7 @@ public class formRegister extends javax.swing.JFrame {
     private javax.swing.JLabel BGRegister;
     private javax.swing.JLabel Title;
     private javax.swing.JLabel TitleNama;
+    private javax.swing.JButton checkAvailabilityButton;
     private javax.swing.JPasswordField fieldConfirmPass;
     private javax.swing.JTextField fieldName;
     private javax.swing.JPasswordField fieldPass;
