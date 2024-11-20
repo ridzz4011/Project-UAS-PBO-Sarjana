@@ -47,8 +47,8 @@ public class formLogin extends javax.swing.JFrame {
         fieldUser = new javax.swing.JTextField();
         titlePass = new javax.swing.JLabel();
         fieldPassword = new javax.swing.JPasswordField();
-        loginButton = new javax.swing.JButton();
         BGLogin = new javax.swing.JLabel();
+        loginButton = new javax.swing.JButton();
 
         jPanel2.setBackground(new java.awt.Color(230, 194, 65));
 
@@ -114,10 +114,10 @@ public class formLogin extends javax.swing.JFrame {
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
+        jPanel1.setBackground(new java.awt.Color(255, 255, 255));
         jPanel1.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         Title.setFont(new java.awt.Font("Times New Roman", 1, 37)); // NOI18N
-        Title.setForeground(new java.awt.Color(0, 0, 0));
         Title.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
         Title.setText("Remind Me!");
         jPanel1.add(Title, new org.netbeans.lib.awtextra.AbsoluteConstraints(340, 60, 210, 50));
@@ -130,7 +130,7 @@ public class formLogin extends javax.swing.JFrame {
 
         registButton.setBackground(new java.awt.Color(230, 194, 65));
         registButton.setFont(new java.awt.Font("Times New Roman", 2, 12)); // NOI18N
-        registButton.setForeground(new java.awt.Color(255, 0, 0));
+        registButton.setForeground(new java.awt.Color(93, 173, 226));
         registButton.setText("Sign Up Here!");
         registButton.setBorder(null);
         registButton.setContentAreaFilled(false);
@@ -139,49 +139,44 @@ public class formLogin extends javax.swing.JFrame {
                 registButtonActionPerformed(evt);
             }
         });
-        jPanel1.add(registButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(410, 250, 100, 20));
+        jPanel1.add(registButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(410, 270, 100, 20));
 
         words.setFont(new java.awt.Font("Times New Roman", 2, 12)); // NOI18N
-        words.setForeground(new java.awt.Color(0, 0, 0));
         words.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
         words.setText("No Account Yet?");
-        jPanel1.add(words, new org.netbeans.lib.awtextra.AbsoluteConstraints(340, 250, 220, 20));
+        jPanel1.add(words, new org.netbeans.lib.awtextra.AbsoluteConstraints(340, 270, 220, 20));
 
         titleUser.setFont(new java.awt.Font("Times New Roman", 0, 12)); // NOI18N
-        titleUser.setForeground(new java.awt.Color(0, 0, 0));
         titleUser.setText("Username: ");
         jPanel1.add(titleUser, new org.netbeans.lib.awtextra.AbsoluteConstraints(340, 130, 60, -1));
 
-        fieldUser.setBackground(new java.awt.Color(255, 255, 255));
-        fieldUser.setForeground(new java.awt.Color(0, 0, 0));
-        fieldUser.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(255, 255, 255)));
+        fieldUser.setBackground(new java.awt.Color(246, 246, 246));
+        fieldUser.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(51, 51, 51)));
         fieldUser.setName(""); // NOI18N
         jPanel1.add(fieldUser, new org.netbeans.lib.awtextra.AbsoluteConstraints(340, 150, 200, -1));
 
         titlePass.setFont(new java.awt.Font("Times New Roman", 0, 12)); // NOI18N
-        titlePass.setForeground(new java.awt.Color(0, 0, 0));
         titlePass.setText("Password: ");
         jPanel1.add(titlePass, new org.netbeans.lib.awtextra.AbsoluteConstraints(340, 170, 60, -1));
 
-        fieldPassword.setBackground(new java.awt.Color(255, 255, 255));
-        fieldPassword.setForeground(new java.awt.Color(0, 0, 0));
-        fieldPassword.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(255, 255, 255)));
+        fieldPassword.setBackground(new java.awt.Color(246, 246, 246));
+        fieldPassword.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
         jPanel1.add(fieldPassword, new org.netbeans.lib.awtextra.AbsoluteConstraints(340, 190, 200, 20));
 
-        loginButton.setBackground(new java.awt.Color(0, 0, 0));
-        loginButton.setForeground(new java.awt.Color(255, 255, 255));
-        loginButton.setText("Login");
-        loginButton.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(255, 255, 255)));
-        loginButton.setContentAreaFilled(false);
+        BGLogin.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/1.png"))); // NOI18N
+        jPanel1.add(BGLogin, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 300, -1));
+
+        loginButton.setBackground(new java.awt.Color(255, 234, 133));
+        loginButton.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        loginButton.setForeground(new java.awt.Color(51, 51, 51));
+        loginButton.setText("Log in");
+        loginButton.setBorder(null);
         loginButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 loginButtonActionPerformed(evt);
             }
         });
-        jPanel1.add(loginButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(340, 220, 200, 20));
-
-        BGLogin.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/1.png"))); // NOI18N
-        jPanel1.add(BGLogin, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 610, -1));
+        jPanel1.add(loginButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(380, 230, 120, 30));
 
         getContentPane().add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 610, 340));
 
@@ -193,8 +188,12 @@ public class formLogin extends javax.swing.JFrame {
        dispose(); 
     }//GEN-LAST:event_registButtonActionPerformed
 
+    private void retryButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_retryButtonActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_retryButtonActionPerformed
+
     private void loginButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_loginButtonActionPerformed
-        
+         
         String idUser = fieldUser.getText();
         String password = new String(fieldPassword.getPassword());
         
@@ -220,12 +219,7 @@ public class formLogin extends javax.swing.JFrame {
         } catch (SQLException | ClassNotFoundException e) {
             JOptionPane.showMessageDialog(null, "Gagal menghubungkan ke database: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }
-        
     }//GEN-LAST:event_loginButtonActionPerformed
-
-    private void retryButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_retryButtonActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_retryButtonActionPerformed
 
     /**
      * @param args the command line arguments

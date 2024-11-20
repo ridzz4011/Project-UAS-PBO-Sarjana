@@ -37,18 +37,21 @@ public class formRegister extends javax.swing.JFrame {
         title = new javax.swing.JLabel();
         loginButton = new javax.swing.JButton();
         words = new javax.swing.JLabel();
+        jLabel1 = new javax.swing.JLabel();
         jPanel1 = new javax.swing.JPanel();
         Title = new javax.swing.JLabel();
         titleUser = new javax.swing.JLabel();
         TitleNama = new javax.swing.JLabel();
         fieldName = new javax.swing.JTextField();
         fieldUser = new javax.swing.JTextField();
-        registerButton = new javax.swing.JButton();
         titlePass = new javax.swing.JLabel();
         fieldPass = new javax.swing.JPasswordField();
         titleConfirmPass = new javax.swing.JLabel();
         fieldConfirmPass = new javax.swing.JPasswordField();
         BGRegister = new javax.swing.JLabel();
+        registerButton = new javax.swing.JButton();
+        words1 = new javax.swing.JLabel();
+        registButton = new javax.swing.JButton();
 
         jPanel2.setBackground(new java.awt.Color(230, 194, 65));
 
@@ -110,83 +113,102 @@ public class formRegister extends javax.swing.JFrame {
             .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
         );
 
+        jLabel1.setText("jLabel1");
+
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
+        jPanel1.setBackground(new java.awt.Color(255, 255, 255));
         jPanel1.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         Title.setFont(new java.awt.Font("Times New Roman", 1, 24)); // NOI18N
-        Title.setForeground(new java.awt.Color(0, 0, 0));
         Title.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
         Title.setText("Register Your Future!");
-        jPanel1.add(Title, new org.netbeans.lib.awtextra.AbsoluteConstraints(330, 40, 240, 50));
+        jPanel1.add(Title, new org.netbeans.lib.awtextra.AbsoluteConstraints(330, 20, 240, 50));
 
         titleUser.setFont(new java.awt.Font("Times New Roman", 0, 12)); // NOI18N
-        titleUser.setForeground(new java.awt.Color(0, 0, 0));
         titleUser.setText("Username: ");
-        jPanel1.add(titleUser, new org.netbeans.lib.awtextra.AbsoluteConstraints(330, 130, 60, -1));
+        jPanel1.add(titleUser, new org.netbeans.lib.awtextra.AbsoluteConstraints(330, 120, 60, -1));
 
         TitleNama.setFont(new java.awt.Font("Times New Roman", 0, 12)); // NOI18N
-        TitleNama.setForeground(new java.awt.Color(0, 0, 0));
         TitleNama.setText("Full Name: ");
-        jPanel1.add(TitleNama, new org.netbeans.lib.awtextra.AbsoluteConstraints(330, 90, 60, -1));
+        jPanel1.add(TitleNama, new org.netbeans.lib.awtextra.AbsoluteConstraints(330, 80, 60, -1));
 
-        fieldName.setBackground(new java.awt.Color(255, 255, 255));
-        fieldName.setForeground(new java.awt.Color(0, 0, 0));
+        fieldName.setBackground(new java.awt.Color(246, 246, 246));
         fieldName.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(255, 255, 255)));
         fieldName.setName(""); // NOI18N
-        jPanel1.add(fieldName, new org.netbeans.lib.awtextra.AbsoluteConstraints(330, 110, 220, -1));
+        jPanel1.add(fieldName, new org.netbeans.lib.awtextra.AbsoluteConstraints(330, 100, 220, -1));
 
-        fieldUser.setBackground(new java.awt.Color(255, 255, 255));
-        fieldUser.setForeground(new java.awt.Color(0, 0, 0));
+        fieldUser.setBackground(new java.awt.Color(246, 246, 246));
         fieldUser.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(255, 255, 255)));
         fieldUser.setName(""); // NOI18N
-        jPanel1.add(fieldUser, new org.netbeans.lib.awtextra.AbsoluteConstraints(330, 150, 220, -1));
+        jPanel1.add(fieldUser, new org.netbeans.lib.awtextra.AbsoluteConstraints(330, 140, 220, -1));
 
-        registerButton.setBackground(new java.awt.Color(230, 194, 65));
-        registerButton.setForeground(new java.awt.Color(255, 255, 255));
+        titlePass.setFont(new java.awt.Font("Times New Roman", 0, 12)); // NOI18N
+        titlePass.setText("Password: ");
+        jPanel1.add(titlePass, new org.netbeans.lib.awtextra.AbsoluteConstraints(330, 160, 60, -1));
+
+        fieldPass.setBackground(new java.awt.Color(246, 246, 246));
+        fieldPass.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(255, 255, 255)));
+        fieldPass.setCaretColor(new java.awt.Color(255, 255, 255));
+        jPanel1.add(fieldPass, new org.netbeans.lib.awtextra.AbsoluteConstraints(330, 180, 220, 20));
+
+        titleConfirmPass.setFont(new java.awt.Font("Times New Roman", 0, 12)); // NOI18N
+        titleConfirmPass.setText("Confirm Password: ");
+        jPanel1.add(titleConfirmPass, new org.netbeans.lib.awtextra.AbsoluteConstraints(330, 200, 100, 20));
+
+        fieldConfirmPass.setBackground(new java.awt.Color(246, 246, 246));
+        fieldConfirmPass.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(255, 255, 255)));
+        fieldConfirmPass.setCaretColor(new java.awt.Color(255, 255, 255));
+        jPanel1.add(fieldConfirmPass, new org.netbeans.lib.awtextra.AbsoluteConstraints(330, 220, 220, 20));
+
+        BGRegister.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/2.png"))); // NOI18N
+        jPanel1.add(BGRegister, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, -20, 290, 370));
+
+        registerButton.setBackground(new java.awt.Color(255, 234, 133));
+        registerButton.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
         registerButton.setText("Register");
-        registerButton.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(255, 255, 255)));
-        registerButton.setContentAreaFilled(false);
         registerButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 registerButtonActionPerformed(evt);
             }
         });
-        jPanel1.add(registerButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(330, 260, 220, 20));
+        jPanel1.add(registerButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(390, 250, 120, 30));
 
-        titlePass.setFont(new java.awt.Font("Times New Roman", 0, 12)); // NOI18N
-        titlePass.setForeground(new java.awt.Color(0, 0, 0));
-        titlePass.setText("Password: ");
-        jPanel1.add(titlePass, new org.netbeans.lib.awtextra.AbsoluteConstraints(330, 170, 60, -1));
+        words1.setFont(new java.awt.Font("Times New Roman", 2, 12)); // NOI18N
+        words1.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
+        words1.setText("Already have Account?");
+        jPanel1.add(words1, new org.netbeans.lib.awtextra.AbsoluteConstraints(330, 290, 120, 20));
 
-        fieldPass.setBackground(new java.awt.Color(255, 255, 255));
-        fieldPass.setForeground(new java.awt.Color(0, 0, 0));
-        fieldPass.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(255, 255, 255)));
-        fieldPass.setCaretColor(new java.awt.Color(255, 255, 255));
-        jPanel1.add(fieldPass, new org.netbeans.lib.awtextra.AbsoluteConstraints(330, 190, 220, 20));
+        registButton.setBackground(new java.awt.Color(230, 194, 65));
+        registButton.setFont(new java.awt.Font("Times New Roman", 2, 12)); // NOI18N
+        registButton.setForeground(new java.awt.Color(93, 173, 226));
+        registButton.setText("Login");
+        registButton.setBorder(null);
+        registButton.setContentAreaFilled(false);
+        registButton.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                registButtonMouseClicked(evt);
+            }
+        });
+        registButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                registButtonActionPerformed(evt);
+            }
+        });
+        jPanel1.add(registButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(430, 290, 60, 20));
 
-        titleConfirmPass.setFont(new java.awt.Font("Times New Roman", 0, 12)); // NOI18N
-        titleConfirmPass.setForeground(new java.awt.Color(0, 0, 0));
-        titleConfirmPass.setText("Confirm Password: ");
-        jPanel1.add(titleConfirmPass, new org.netbeans.lib.awtextra.AbsoluteConstraints(330, 210, 100, 20));
-
-        fieldConfirmPass.setBackground(new java.awt.Color(255, 255, 255));
-        fieldConfirmPass.setForeground(new java.awt.Color(0, 0, 0));
-        fieldConfirmPass.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(255, 255, 255)));
-        fieldConfirmPass.setCaretColor(new java.awt.Color(255, 255, 255));
-        jPanel1.add(fieldConfirmPass, new org.netbeans.lib.awtextra.AbsoluteConstraints(330, 230, 220, 20));
-
-        BGRegister.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/2.png"))); // NOI18N
-        jPanel1.add(BGRegister, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 640, -1));
-
-        getContentPane().add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 610, 340));
+        getContentPane().add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 620, 360));
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+    private void loginButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_loginButtonActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_loginButtonActionPerformed
+
     private void registerButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_registerButtonActionPerformed
-        String namaUser = fieldName.getText();
+          String namaUser = fieldName.getText();
         String idUser = fieldUser.getText();
         String password = new String(fieldPass.getPassword());
         String confirmPassword = new String(fieldConfirmPass.getPassword());
@@ -226,12 +248,17 @@ public class formRegister extends javax.swing.JFrame {
                 JOptionPane.showMessageDialog(null, "Gagal menghubungkan ke database: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
             }
         }
-        
     }//GEN-LAST:event_registerButtonActionPerformed
 
-    private void loginButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_loginButtonActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_loginButtonActionPerformed
+    private void registButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_registButtonActionPerformed
+        new formLogin().setVisible(true);
+        dispose();
+    }//GEN-LAST:event_registButtonActionPerformed
+
+    private void registButtonMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_registButtonMouseClicked
+         new formLogin().setVisible(true);
+       dispose();
+    }//GEN-LAST:event_registButtonMouseClicked
 
     /**
      * @param args the command line arguments
@@ -278,14 +305,17 @@ public class formRegister extends javax.swing.JFrame {
     private javax.swing.JPasswordField fieldPass;
     private javax.swing.JTextField fieldUser;
     private javax.swing.JDialog jDialogSuccesRegister;
+    private javax.swing.JLabel jLabel1;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JButton loginButton;
+    private javax.swing.JButton registButton;
     private javax.swing.JButton registerButton;
     private javax.swing.JLabel title;
     private javax.swing.JLabel titleConfirmPass;
     private javax.swing.JLabel titlePass;
     private javax.swing.JLabel titleUser;
     private javax.swing.JLabel words;
+    private javax.swing.JLabel words1;
     // End of variables declaration//GEN-END:variables
 }
