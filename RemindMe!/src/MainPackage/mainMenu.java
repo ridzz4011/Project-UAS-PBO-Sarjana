@@ -4,26 +4,175 @@
  */
 package MainPackage;
 
+import java.sql.ResultSet;
+import DatabaseConnection.*;
+import Custom.Setting;
+import java.awt.Color;
+import java.awt.Point;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Locale;
+import javax.swing.JOptionPane;
+import javax.swing.Timer;
+import javax.swing.table.DefaultTableModel;
+
 /**
  *
  * @author soery
  */
 public class mainMenu extends javax.swing.JFrame {
-
-    private String currentUser;
+    private Timer timer;
+    private static String currentUser;
     
     public mainMenu(String currentUser) {
         this.currentUser = currentUser; // Simpan data user yang login
         initComponents();
+        tampilkanData();
+        
+        //Mengganti warna background header 
+        tugasTB.getTableHeader().setOpaque(false);
+        tugasTB.getTableHeader().setBackground(new Color(255,234,133));
+        
+        //MEnampilkan waktu
+        timer = new Timer(1000,new ActionListener() {
+        
+                public void actionPerformed(ActionEvent e) {
+                showDayDateTime();
+            }
+        });
+
+        timer.start();
     }
     
     public String currentUser() {
         return currentUser;
     }
     
-    public mainMenu() {
-        initComponents();
+     private void showDayDateTime(){
+        Calendar calendar = Calendar.getInstance();
+        Date now = new Date();
+        SimpleDateFormat formatHari = new SimpleDateFormat("EEEE", new Locale("in", "ID"));
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
+        String hari = formatHari.format(calendar.getTime());
+        String dateTime = dateFormat.format(now);
+        tanggal.setText(hari+", "+dateTime);
     }
+     
+    private void pencarian(){
+        DefaultTableModel tableTugas = (DefaultTableModel) tugasTB.getModel();
+        String search = searchField.getText().trim(); // Ambil input pencarian dan hilangkan spasi ekstra
+        try (Connection conn = DBConnection.konek()) {
+            // Kosongkan tabel sebelum menambahkan data baru
+            int jumlahRow = tugasTB.getRowCount();
+            for (int i = 0; i < jumlahRow; i++) {
+                tableTugas.removeRow(0);
+            }
+
+            // Ambil idPengguna berdasarkan username
+            String getID = "SELECT idPengguna FROM pengguna WHERE username = ?";
+            PreparedStatement pstmt1 = conn.prepareStatement(getID);
+            pstmt1.setString(1, currentUser);
+            ResultSet rs1 = pstmt1.executeQuery();
+
+            int userID = -1; // Default jika id tidak ditemukan
+            if (rs1.next()) {
+                userID = rs1.getInt("idPengguna"); // Ambil nilai idPengguna
+            } else {
+                JOptionPane.showMessageDialog(this, "ID Pengguna Tidak ditemukan.", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+            // Query untuk pencarian berdasarkan namaTugas atau namaMatkul
+            String query = "SELECT namaTugas, deadlineTugas, namaMatkul "
+                         + "FROM tugas "
+                         + "WHERE idPengguna = ? AND (namaTugas LIKE ? OR namaMatkul LIKE ?)";
+            PreparedStatement pstmt2 = conn.prepareStatement(query);
+
+            pstmt2.setInt(1, userID);
+            pstmt2.setString(2, "%" + search + "%"); // Tambahkan wildcard % untuk LIKE
+            pstmt2.setString(3, "%" + search + "%");
+
+            ResultSet rs2 = pstmt2.executeQuery();
+
+            // Tambahkan data yang ditemukan ke tabel
+            int no = 1;
+            while (rs2.next()) {
+                String[] baris = {
+                    String.valueOf(no),              // Nomor urut
+                    rs2.getString("namaTugas"),      // Nama Tugas
+                    rs2.getString("namaMatkul"),     // Nama Mata Kuliah
+                    rs2.getString("deadlineTugas")   // Deadline
+                };
+                tableTugas.addRow(baris);
+                no++;
+            }
+
+            // Tampilkan pesan jika tidak ada data ditemukan
+            if (no == 1) {
+                JOptionPane.showMessageDialog(this, "Tidak ada data yang cocok dengan pencarian.", "Informasi", JOptionPane.INFORMATION_MESSAGE);
+            }
+
+        } catch (SQLException | ClassNotFoundException e) {
+                JOptionPane.showMessageDialog(this, "Error: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+                e.printStackTrace();
+        }
+    }
+    
+    private void tampilkanData() {
+        DefaultTableModel tableTugas = (DefaultTableModel) tugasTB.getModel();
+        try (Connection conn = DBConnection.konek()) {
+            int jumlahRow = tugasTB.getRowCount();
+            for(int i = 0; i < jumlahRow; i++) {
+                tableTugas.removeRow(0);
+            }
+            
+            String getID = "SELECT idPengguna, namaPengguna FROM pengguna WHERE username = ?";
+            PreparedStatement pstmt1 = conn.prepareStatement(getID);           
+            pstmt1.setString(1, currentUser);
+            ResultSet rs1 = pstmt1.executeQuery();
+            
+            int userID = 0; // Default jika id tidak ditemukan
+            String namaLengkap;
+            if (rs1.next()) {
+                userID = rs1.getInt("idPengguna"); // Ambil nilai idPengguna
+                namaLengkap = rs1.getString("namaPengguna");
+                namaLabel.setText(namaLengkap);
+            } else {
+                JOptionPane.showMessageDialog(null, "ID Pengguna Tidak ditemukan", "ID NOT FOUND", JOptionPane.ERROR_MESSAGE);
+                new formLogin().setVisible(true);
+                dispose();
+                return;
+            }
+            
+            String query = "SELECT namaTugas, deadlineTugas, namaMatkul"
+                    + " FROM tugas WHERE idPengguna = ?";
+            PreparedStatement pstmt = conn.prepareStatement(query);           
+            pstmt.setInt(1, userID);
+            ResultSet rs = pstmt.executeQuery();
+            
+            int no = 1;
+            while (rs.next()) {
+                String baris[] = {
+                    String.valueOf(no),              // Nomor urut
+                    rs.getString("namaTugas"),       // Nama Tugas
+                    rs.getString("deadlineTugas"),   // Deadline
+                    rs.getString("namaMatkul")       // Nama Matkul
+                };
+                
+                tableTugas.addRow(baris);
+                no++;
+            }
+        } catch (SQLException | ClassNotFoundException e) {
+            
+        }
+    }
+
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -35,111 +184,35 @@ public class mainMenu extends javax.swing.JFrame {
     private void initComponents() {
 
         dateChooser = new com.raven.datechooser.DateChooser();
-        sideBar = new javax.swing.JPanel();
-        jScrollPane2 = new javax.swing.JScrollPane();
-        jPanel2 = new javax.swing.JPanel();
-        buttonAddTask = new javax.swing.JButton();
-        exampleTaskList = new javax.swing.JButton();
-        exampleTaskList2 = new javax.swing.JButton();
-        sortingButton = new javax.swing.JButton();
-        navBar = new javax.swing.JPanel();
-        userButton = new javax.swing.JButton();
-        kalenderButton = new javax.swing.JButton();
         jPanel1 = new javax.swing.JPanel();
-        labelTitle = new javax.swing.JLabel();
-        labelTitle1 = new javax.swing.JLabel();
-        labelTitle2 = new javax.swing.JLabel();
-        labelTitle3 = new javax.swing.JLabel();
-        labelTitle4 = new javax.swing.JLabel();
-        labelTitle5 = new javax.swing.JLabel();
-        labelTitle6 = new javax.swing.JLabel();
+        navBar = new javax.swing.JPanel();
+        tanggal = new javax.swing.JLabel();
+        userButton = new javax.swing.JButton();
+        namaLabel = new javax.swing.JLabel();
+        jLabel1 = new javax.swing.JLabel();
+        buttonAddTask = new javax.swing.JButton();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        tugasTB = new javax.swing.JTable();
+        searchField = new javax.swing.JTextField();
+        jLabel2 = new javax.swing.JLabel();
+        jLabel3 = new javax.swing.JLabel();
+        editButton = new javax.swing.JButton();
+        sortButton = new javax.swing.JButton();
 
         dateChooser.setForeground(new java.awt.Color(230, 194, 65));
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
-        sideBar.setBackground(new java.awt.Color(255, 255, 255));
+        jPanel1.setBackground(new java.awt.Color(251, 250, 250));
+        jPanel1.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
-        jPanel2.setBackground(new java.awt.Color(255, 255, 255));
+        navBar.setBackground(new java.awt.Color(255, 234, 133));
 
-        buttonAddTask.setBackground(new java.awt.Color(230, 194, 65));
-        buttonAddTask.setFont(new java.awt.Font("Times New Roman", 0, 12)); // NOI18N
-        buttonAddTask.setForeground(new java.awt.Color(255, 255, 255));
-        buttonAddTask.setText("Add New Task");
-        buttonAddTask.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                buttonAddTaskActionPerformed(evt);
-            }
-        });
+        tanggal.setForeground(new java.awt.Color(102, 102, 102));
+        tanggal.setText("Hari, Tanggal dan Waktu");
 
-        exampleTaskList.setFont(new java.awt.Font("Times New Roman", 0, 12)); // NOI18N
-        exampleTaskList.setForeground(new java.awt.Color(230, 194, 65));
-        exampleTaskList.setText("PBO Task");
-        exampleTaskList.setBorder(null);
-
-        exampleTaskList2.setFont(new java.awt.Font("Times New Roman", 0, 12)); // NOI18N
-        exampleTaskList2.setForeground(new java.awt.Color(230, 194, 65));
-        exampleTaskList2.setText("UAS Project Database");
-        exampleTaskList2.setBorder(null);
-
-        sortingButton.setBackground(new java.awt.Color(230, 194, 65));
-        sortingButton.setFont(new java.awt.Font("Times New Roman", 0, 12)); // NOI18N
-        sortingButton.setForeground(new java.awt.Color(255, 255, 255));
-        sortingButton.setText("Sort By...");
-
-        javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
-        jPanel2.setLayout(jPanel2Layout);
-        jPanel2Layout.setHorizontalGroup(
-            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel2Layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel2Layout.createSequentialGroup()
-                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                            .addComponent(exampleTaskList2, javax.swing.GroupLayout.DEFAULT_SIZE, 171, Short.MAX_VALUE)
-                            .addComponent(buttonAddTask, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(exampleTaskList, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                        .addGap(0, 0, Short.MAX_VALUE))
-                    .addComponent(sortingButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addContainerGap())
-        );
-        jPanel2Layout.setVerticalGroup(
-            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(buttonAddTask)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(exampleTaskList, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(exampleTaskList2, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 218, Short.MAX_VALUE)
-                .addComponent(sortingButton)
-                .addContainerGap())
-        );
-
-        jScrollPane2.setViewportView(jPanel2);
-
-        javax.swing.GroupLayout sideBarLayout = new javax.swing.GroupLayout(sideBar);
-        sideBar.setLayout(sideBarLayout);
-        sideBarLayout.setHorizontalGroup(
-            sideBarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, sideBarLayout.createSequentialGroup()
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 191, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 0, Short.MAX_VALUE))
-        );
-        sideBarLayout.setVerticalGroup(
-            sideBarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(sideBarLayout.createSequentialGroup()
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 334, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(16, Short.MAX_VALUE))
-        );
-
-        getContentPane().add(sideBar, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 40, 190, 350));
-
-        navBar.setBackground(new java.awt.Color(153, 153, 153));
-
-        userButton.setBackground(new java.awt.Color(153, 153, 153));
+        userButton.setBackground(new java.awt.Color(121, 134, 199));
         userButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/user.png"))); // NOI18N
         userButton.setBorder(null);
         userButton.addActionListener(new java.awt.event.ActionListener() {
@@ -148,95 +221,162 @@ public class mainMenu extends javax.swing.JFrame {
             }
         });
 
-        kalenderButton.setBackground(new java.awt.Color(153, 153, 153));
-        kalenderButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/kalender.png"))); // NOI18N
-        kalenderButton.setBorder(null);
-        kalenderButton.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                kalenderButtonActionPerformed(evt);
-            }
-        });
+        namaLabel.setFont(new java.awt.Font("SansSerif", 1, 12)); // NOI18N
+        namaLabel.setText("Nama Lengkap");
+
+        jLabel1.setFont(new java.awt.Font("Times New Roman", 1, 14)); // NOI18N
+        jLabel1.setText("Remind Me!");
 
         javax.swing.GroupLayout navBarLayout = new javax.swing.GroupLayout(navBar);
         navBar.setLayout(navBarLayout);
         navBarLayout.setHorizontalGroup(
             navBarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(navBarLayout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(userButton, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(kalenderButton, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(576, Short.MAX_VALUE))
+                .addGroup(navBarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addGroup(navBarLayout.createSequentialGroup()
+                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(tanggal))
+                    .addGroup(navBarLayout.createSequentialGroup()
+                        .addGap(28, 28, 28)
+                        .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 87, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 450, Short.MAX_VALUE)
+                        .addComponent(namaLabel)))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(userButton, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap())
         );
         navBarLayout.setVerticalGroup(
             navBarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(navBarLayout.createSequentialGroup()
+                .addContainerGap()
                 .addGroup(navBarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(userButton, javax.swing.GroupLayout.PREFERRED_SIZE, 34, Short.MAX_VALUE)
-                    .addComponent(kalenderButton, javax.swing.GroupLayout.PREFERRED_SIZE, 34, Short.MAX_VALUE))
+                    .addGroup(navBarLayout.createSequentialGroup()
+                        .addGroup(navBarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(namaLabel)
+                            .addComponent(jLabel1))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(tanggal, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(userButton, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
                 .addContainerGap())
         );
 
-        getContentPane().add(navBar, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 640, 40));
+        jPanel1.add(navBar, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 700, 50));
 
-        jPanel1.setBackground(new java.awt.Color(230, 194, 65));
-        jPanel1.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+        buttonAddTask.setBackground(new java.awt.Color(255, 234, 133));
+        buttonAddTask.setText("Add Task");
+        buttonAddTask.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                buttonAddTaskActionPerformed(evt);
+            }
+        });
+        jPanel1.add(buttonAddTask, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 120, 90, -1));
 
-        labelTitle.setFont(new java.awt.Font("Times New Roman", 0, 12)); // NOI18N
-        labelTitle.setForeground(new java.awt.Color(255, 255, 255));
-        labelTitle.setText("4. Mengurutkan Tugas ");
-        jPanel1.add(labelTitle, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 190, 230, -1));
+        jScrollPane1.setBackground(new java.awt.Color(255, 234, 133));
 
-        labelTitle1.setFont(new java.awt.Font("Times New Roman", 1, 36)); // NOI18N
-        labelTitle1.setForeground(new java.awt.Color(255, 255, 255));
-        labelTitle1.setText("Remind Me!");
-        jPanel1.add(labelTitle1, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 20, 230, 60));
+        tugasTB.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
 
-        labelTitle2.setFont(new java.awt.Font("Times New Roman", 0, 12)); // NOI18N
-        labelTitle2.setForeground(new java.awt.Color(255, 255, 255));
-        labelTitle2.setText("Remind Me! adalah aplikasi yang dirancang untuk membantu mahasiswa ");
-        jPanel1.add(labelTitle2, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 90, 360, -1));
+            },
+            new String [] {
+                "No", "Nama Tugas", "Deadline", "Nama Matkul"
+            }
+        ));
+        tugasTB.setColumnSelectionAllowed(true);
+        tugasTB.setFocusable(false);
+        tugasTB.setShowGrid(false);
+        tugasTB.setShowHorizontalLines(true);
+        tugasTB.getTableHeader().setReorderingAllowed(false);
+        jScrollPane1.setViewportView(tugasTB);
+        tugasTB.getColumnModel().getSelectionModel().setSelectionMode(javax.swing.ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
 
-        labelTitle3.setFont(new java.awt.Font("Times New Roman", 0, 12)); // NOI18N
-        labelTitle3.setForeground(new java.awt.Color(255, 255, 255));
-        labelTitle3.setText("1. Mencatat Detail Tugas");
-        jPanel1.add(labelTitle3, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 130, 230, -1));
+        jPanel1.add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 160, 640, 230));
 
-        labelTitle4.setFont(new java.awt.Font("Times New Roman", 0, 12)); // NOI18N
-        labelTitle4.setForeground(new java.awt.Color(255, 255, 255));
-        labelTitle4.setText("2. Menampilkan Kalender Tugas");
-        jPanel1.add(labelTitle4, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 150, 230, -1));
+        searchField.setForeground(new java.awt.Color(153, 153, 153));
+        searchField.setText("Search");
+        searchField.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                searchFieldMouseClicked(evt);
+            }
+        });
+        searchField.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                searchFieldActionPerformed(evt);
+            }
+        });
+        searchField.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                searchFieldKeyTyped(evt);
+            }
+        });
+        jPanel1.add(searchField, new org.netbeans.lib.awtextra.AbsoluteConstraints(420, 120, 170, -1));
 
-        labelTitle5.setFont(new java.awt.Font("Times New Roman", 0, 12)); // NOI18N
-        labelTitle5.setForeground(new java.awt.Color(255, 255, 255));
-        labelTitle5.setText("3. Memberikan Notifikati Berdasarkan Deadline");
-        jPanel1.add(labelTitle5, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 170, 230, -1));
+        jLabel2.setFont(new java.awt.Font("SansSerif", 1, 13)); // NOI18N
+        jLabel2.setText("Daftar Tugas");
+        jPanel1.add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 70, -1, 30));
 
-        labelTitle6.setFont(new java.awt.Font("Times New Roman", 0, 12)); // NOI18N
-        labelTitle6.setForeground(new java.awt.Color(255, 255, 255));
-        labelTitle6.setText("mengelola tugas dengan lebih mudah. Aplikasi ini dapat:");
-        jPanel1.add(labelTitle6, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 110, 290, -1));
+        jLabel3.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/daftartugas.png"))); // NOI18N
+        jPanel1.add(jLabel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 80, -1, -1));
 
-        getContentPane().add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(190, 40, 450, 330));
+        editButton.setBackground(new java.awt.Color(255, 234, 133));
+        editButton.setText("Edit");
+        editButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                editButtonActionPerformed(evt);
+            }
+        });
+        jPanel1.add(editButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(150, 120, -1, -1));
+
+        sortButton.setBackground(new java.awt.Color(255, 234, 133));
+        sortButton.setText("Sort By");
+        sortButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                sortButtonActionPerformed(evt);
+            }
+        });
+        jPanel1.add(sortButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(600, 120, -1, 30));
+
+        getContentPane().add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 700, 400));
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void userButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_userButtonActionPerformed
-        formProfile profilePage = new formProfile(currentUser);
-        profilePage.setVisible(true);
-        dispose();
-    }//GEN-LAST:event_userButtonActionPerformed
-
-    private void kalenderButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_kalenderButtonActionPerformed
-        dateChooser.showPopup();
-    }//GEN-LAST:event_kalenderButtonActionPerformed
-
     private void buttonAddTaskActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonAddTaskActionPerformed
-        taskMainMenu taskPage = new taskMainMenu(currentUser);
+        addTaskPage taskPage = new addTaskPage(currentUser);
         taskPage.setVisible(true);
         dispose();
     }//GEN-LAST:event_buttonAddTaskActionPerformed
+
+    private void searchFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_searchFieldActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_searchFieldActionPerformed
+
+    private void searchFieldMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_searchFieldMouseClicked
+        searchField.setText("");
+    }//GEN-LAST:event_searchFieldMouseClicked
+
+    private void searchFieldKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_searchFieldKeyTyped
+       pencarian();
+    }//GEN-LAST:event_searchFieldKeyTyped
+
+    private void userButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_userButtonActionPerformed
+        Setting menu = new Setting(this, true, this);
+        
+        Point p = userButton.getLocationOnScreen();
+        int x = p.x + userButton.getWidth() - menu.getWidth();
+        int y = p.y + userButton.getHeight();
+        menu.setLocation(x,y);
+        menu.setVisible(true);
+        dispose();
+    }//GEN-LAST:event_userButtonActionPerformed
+
+    private void editButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_editButtonActionPerformed
+            new taskMainMenu().setVisible(true);
+            dispose(); 
+    }//GEN-LAST:event_editButtonActionPerformed
+
+    private void sortButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_sortButtonActionPerformed
+        
+    }//GEN-LAST:event_sortButtonActionPerformed
 
     /**
      * @param args the command line arguments
@@ -331,7 +471,8 @@ public class mainMenu extends javax.swing.JFrame {
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new mainMenu().setVisible(true);
+                mainMenu mainMenuPage = new mainMenu(currentUser); // Kirim currentUser ke Main Menu
+                mainMenuPage.setVisible(true);
             }
         });
     }
@@ -339,22 +480,18 @@ public class mainMenu extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton buttonAddTask;
     private com.raven.datechooser.DateChooser dateChooser;
-    private javax.swing.JButton exampleTaskList;
-    private javax.swing.JButton exampleTaskList2;
+    private javax.swing.JButton editButton;
+    private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel3;
     private javax.swing.JPanel jPanel1;
-    private javax.swing.JPanel jPanel2;
-    private javax.swing.JScrollPane jScrollPane2;
-    private javax.swing.JButton kalenderButton;
-    private javax.swing.JLabel labelTitle;
-    private javax.swing.JLabel labelTitle1;
-    private javax.swing.JLabel labelTitle2;
-    private javax.swing.JLabel labelTitle3;
-    private javax.swing.JLabel labelTitle4;
-    private javax.swing.JLabel labelTitle5;
-    private javax.swing.JLabel labelTitle6;
+    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JLabel namaLabel;
     private javax.swing.JPanel navBar;
-    private javax.swing.JPanel sideBar;
-    private javax.swing.JButton sortingButton;
+    private javax.swing.JTextField searchField;
+    private javax.swing.JButton sortButton;
+    private javax.swing.JLabel tanggal;
+    private javax.swing.JTable tugasTB;
     private javax.swing.JButton userButton;
     // End of variables declaration//GEN-END:variables
 }

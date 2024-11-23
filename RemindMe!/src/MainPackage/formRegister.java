@@ -48,7 +48,7 @@ public class formRegister extends javax.swing.JFrame {
         BGRegister = new javax.swing.JLabel();
         registerButton = new javax.swing.JButton();
         words1 = new javax.swing.JLabel();
-        registButton = new javax.swing.JButton();
+        loginnButton = new javax.swing.JButton();
 
         jPanel2.setBackground(new java.awt.Color(230, 194, 65));
 
@@ -186,23 +186,23 @@ public class formRegister extends javax.swing.JFrame {
         words1.setText("Already have Account?");
         jPanel1.add(words1, new org.netbeans.lib.awtextra.AbsoluteConstraints(330, 290, 120, 20));
 
-        registButton.setBackground(new java.awt.Color(230, 194, 65));
-        registButton.setFont(new java.awt.Font("Times New Roman", 2, 12)); // NOI18N
-        registButton.setForeground(new java.awt.Color(93, 173, 226));
-        registButton.setText("Login");
-        registButton.setBorder(null);
-        registButton.setContentAreaFilled(false);
-        registButton.addMouseListener(new java.awt.event.MouseAdapter() {
+        loginnButton.setBackground(new java.awt.Color(230, 194, 65));
+        loginnButton.setFont(new java.awt.Font("Times New Roman", 2, 12)); // NOI18N
+        loginnButton.setForeground(new java.awt.Color(93, 173, 226));
+        loginnButton.setText("Login");
+        loginnButton.setBorder(null);
+        loginnButton.setContentAreaFilled(false);
+        loginnButton.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
-                registButtonMouseClicked(evt);
+                loginnButtonMouseClicked(evt);
             }
         });
-        registButton.addActionListener(new java.awt.event.ActionListener() {
+        loginnButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                registButtonActionPerformed(evt);
+                loginnButtonActionPerformed(evt);
             }
         });
-        jPanel1.add(registButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(430, 290, 60, 20));
+        jPanel1.add(loginnButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(430, 290, 60, 20));
 
         getContentPane().add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 620, 360));
 
@@ -260,21 +260,21 @@ public class formRegister extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_registerButtonActionPerformed
 
-    private void registButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_registButtonActionPerformed
+    private void loginnButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_loginnButtonActionPerformed
         new formLogin().setVisible(true);
         dispose();
-    }//GEN-LAST:event_registButtonActionPerformed
+    }//GEN-LAST:event_loginnButtonActionPerformed
 
-    private void registButtonMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_registButtonMouseClicked
+    private void loginnButtonMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_loginnButtonMouseClicked
         new formLogin().setVisible(true);
         dispose();
-    }//GEN-LAST:event_registButtonMouseClicked
+    }//GEN-LAST:event_loginnButtonMouseClicked
 
     private void checkAvailabilityButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_checkAvailabilityButtonActionPerformed
         String idUser = fieldUser.getText();
         
         try (Connection conn = DBConnection.konek()) {
-            String query = ("SELECT * FROM pengguna WHERE namaPengguna = ?");
+            String query = ("SELECT * FROM pengguna WHERE username = ?");
             PreparedStatement pstmt = conn.prepareStatement(query);
             
             pstmt.setString(1, idUser);
@@ -346,7 +346,7 @@ public class formRegister extends javax.swing.JFrame {
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JButton loginButton;
-    private javax.swing.JButton registButton;
+    private javax.swing.JButton loginnButton;
     private javax.swing.JButton registerButton;
     private javax.swing.JLabel title;
     private javax.swing.JLabel titleConfirmPass;
