@@ -4,6 +4,9 @@
  */
 package MainPackage;
 
+import Custom.Setting;
+import java.awt.Point;
+
 /**
  *
  * @author soery
@@ -304,8 +307,13 @@ public class setReminder extends javax.swing.JFrame {
     }//GEN-LAST:event_kalenderButton1ActionPerformed
 
     private void userButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_userButtonActionPerformed
-        formProfile profilePage = new formProfile(currentUser);
-        profilePage.setVisible(true);
+        Setting menu = new Setting(this, true, this);
+        
+        Point p = userButton.getLocationOnScreen();
+        int x = p.x + userButton.getWidth() - menu.getWidth();
+        int y = p.y + userButton.getHeight();
+        menu.setLocation(x,y);
+        menu.setVisible(true);
         dispose();
     }//GEN-LAST:event_userButtonActionPerformed
 

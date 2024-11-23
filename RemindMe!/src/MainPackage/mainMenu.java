@@ -106,8 +106,8 @@ public class mainMenu extends javax.swing.JFrame {
                 String[] baris = {
                     String.valueOf(no),              // Nomor urut
                     rs2.getString("namaTugas"),      // Nama Tugas
-                    rs2.getString("namaMatkul"),     // Nama Mata Kuliah
-                    rs2.getString("deadlineTugas")   // Deadline
+                    rs2.getString("deadlineTugas"),  // Deadline
+                    rs2.getString("namaMatkul")      // Nama Mata Kuliah
                 };
                 tableTugas.addRow(baris);
                 no++;
