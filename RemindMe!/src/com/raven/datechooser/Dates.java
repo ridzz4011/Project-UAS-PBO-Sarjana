@@ -20,12 +20,12 @@ public final class Dates extends javax.swing.JPanel {
 
     public Dates() {
         initComponents();
-        SimpleDateFormat df = new SimpleDateFormat("dd-MM-yyyy");
+        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
         Date date = new Date();
         String toDay = df.format(date);
-        DAY = Integer.valueOf(toDay.split("-")[0]);
+        YEAR = Integer.valueOf(toDay.split("-")[0]);
         MONTH = Integer.valueOf(toDay.split("-")[1]);
-        YEAR = Integer.valueOf(toDay.split("-")[2]);
+        DAY = Integer.valueOf(toDay.split("-")[2]);
     }
 
     public void showDate(int month, int year, SelectedDate select) {

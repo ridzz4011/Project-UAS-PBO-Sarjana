@@ -4,7 +4,7 @@
  */
 package MainPackage;
 
-import DatabaseConnection.*;
+import EventHandler.DBConnection;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -198,7 +198,7 @@ public class formLogin extends javax.swing.JFrame {
         String password = new String(fieldPassword.getPassword());
         
         try (Connection conn = DBConnection.konek()) {
-            String query = "SELECT * FROM pengguna WHERE username = ? AND password = ?";
+            String query = "SELECT idPengguna FROM pengguna WHERE username = ? AND password = ?";
             PreparedStatement pstmt = conn.prepareStatement(query);
             pstmt.setString(1, idUser);
             pstmt.setString(2, password);

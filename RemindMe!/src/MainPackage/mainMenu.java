@@ -3,6 +3,7 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
  */
 package MainPackage;
+
 import Custom.Setting;
 import java.awt.Color;
 import java.awt.Point;
@@ -14,6 +15,17 @@ import java.util.Date;
 import java.util.Locale;
 import javax.swing.Timer;
 
+import EventHandler.DBConnection;
+import EventHandler.ErrorHandler;
+import EventHandler.CekUser;
+import EventHandler.CekTugas;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import javax.swing.JOptionPane;
+import javax.swing.table.DefaultTableModel;
+
 /**
  *
  * @author soery
@@ -21,10 +33,40 @@ import javax.swing.Timer;
 public class mainMenu extends javax.swing.JFrame {
     private Timer timer;
     private String currentUser;
+    private int taskId;
+    private String taskName;
     
     public mainMenu(String currentUser) {
         this.currentUser = currentUser; // Simpan data user yang login
         initComponents();
+        
+        try (Connection conn = DBConnection.konek()) {
+            int userID = CekUser.fetchUserId(conn, currentUser, namaLabel);
+            
+            if (userID == -1) {
+                JOptionPane.showMessageDialog(null, "Anda belum Login!");
+                new formLogin().setVisible(true);
+                dispose();
+            } else {
+                tugasTB.getTableHeader().setOpaque(false);
+                tugasTB.getTableHeader().setBackground(new Color(255,234,133));
+        
+                //MEnampilkan waktu
+                timer = new Timer(1000,new ActionListener() {
+        
+                    public void actionPerformed(ActionEvent e) {
+                        showDayDateTime();
+                    }
+                }
+                );
+
+                timer.start(); 
+        
+                tampilkanData();
+            }    
+        } catch(SQLException | ClassNotFoundException e) {
+            ErrorHandler.eHandler(e, "Gagal mengambil data dari database!");
+        }  
     }
     
     public String currentUser() {
@@ -41,12 +83,15 @@ public class mainMenu extends javax.swing.JFrame {
         //MEnampilkan waktu
         timer = new Timer(1000,new ActionListener() {
         
-                public void actionPerformed(ActionEvent e) {
+            public void actionPerformed(ActionEvent e) {
                 showDayDateTime();
             }
-        });
+        }
+        );
 
-        timer.start();   
+        timer.start();
+        
+        tampilkanData();
     }
     
      private void showDayDateTime(){
@@ -60,8 +105,83 @@ public class mainMenu extends javax.swing.JFrame {
     }
      
      private void pencarian(){
-         //method here!
-     }
+        // Membersihkan data di table
+        DefaultTableModel tableTugas = (DefaultTableModel) tugasTB.getModel();
+        tableTugas.setRowCount(0);
+        
+        try (Connection conn = DBConnection.konek()) {
+            int userID = CekUser.fetchUserId(conn, currentUser, namaLabel);
+            
+            // Query untuk pencarian berdasarkan namaTugas atau namaMatkul
+            String query = "SELECT namaTugas, deadlineTugas, namaMatkul "
+                         + "FROM tugas "
+                         + "WHERE idPengguna = ? AND (namaTugas LIKE ? OR namaMatkul LIKE ?)";
+            PreparedStatement pstmt2 = conn.prepareStatement(query);
+
+            pstmt2.setInt(1, userID);
+            pstmt2.setString(2, "%" + search + "%"); // Tambahkan wildcard % untuk LIKE
+            pstmt2.setString(3, "%" + search + "%");
+
+            ResultSet rs2 = pstmt2.executeQuery();
+
+            // Tambahkan data yang ditemukan ke tabel
+            int no = 1;
+            while (rs2.next()) {
+                String[] baris = {
+                    String.valueOf(no),              // Nomor urut
+                    rs2.getString("namaTugas"),      // Nama Tugas
+                    rs2.getString("namaMatkul"),     // Nama Mata Kuliah
+                    rs2.getString("deadlineTugas")   // Deadline
+                };
+                tableTugas.addRow(baris);
+                no++;
+            }
+
+            // Tampilkan pesan jika tidak ada data ditemukan
+            if (no == 1) {
+                JOptionPane.showMessageDialog(this, "Tidak ada data yang cocok dengan pencarian.", "Informasi", JOptionPane.INFORMATION_MESSAGE);
+            }
+        } catch (SQLException | ClassNotFoundException e) {
+            ErrorHandler.eHandler(e, "Gagal mengambil data dari database!");
+        }
+    }
+    
+    private void tampilkanData() {
+        // Membuat table tidak bisa diedit
+        DefaultTableModel tableTugas = new DefaultTableModel(new String[]{"No", "Nama Tugas", "Deadline", "Nama Matkul"}, 0) {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false;
+            }
+        };
+        tugasTB.setModel(tableTugas);
+        
+        try (Connection conn = DBConnection.konek()) {
+            int userID = CekUser.fetchUserId(conn, currentUser, namaLabel);
+            
+            String query = "SELECT namaTugas, deadlineTugas, namaMatkul"
+                        + " FROM tugas WHERE idPengguna = ?";
+            PreparedStatement pstmt = conn.prepareStatement(query);           
+            pstmt.setInt(1, userID);
+            ResultSet rs = pstmt.executeQuery();
+            
+            int no = 1;
+            while (rs.next()) {
+                String baris[] = {
+                    String.valueOf(no),              // Nomor urut
+                    rs.getString("namaTugas"),       // Nama Tugas
+                    rs.getString("deadlineTugas"),   // Deadline
+                    rs.getString("namaMatkul")       // Nama Matkul
+                };
+                
+                tableTugas.addRow(baris);
+                no++;
+            }
+        } catch (SQLException | ClassNotFoundException e) {
+            ErrorHandler.eHandler(e, "Gagal mengambil data dari database!");
+        }
+            
+    }
 
 
     /**
@@ -84,10 +204,9 @@ public class mainMenu extends javax.swing.JFrame {
         jScrollPane1 = new javax.swing.JScrollPane();
         tugasTB = new javax.swing.JTable();
         sortingButton = new javax.swing.JButton();
-        srch = new javax.swing.JTextField();
+        search = new javax.swing.JTextField();
         jLabel2 = new javax.swing.JLabel();
         jLabel3 = new javax.swing.JLabel();
-        editButton = new javax.swing.JButton();
 
         dateChooser.setForeground(new java.awt.Color(230, 194, 65));
 
@@ -165,18 +284,24 @@ public class mainMenu extends javax.swing.JFrame {
 
         tugasTB.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {null, null, null, null, null},
-                {null, null, null, null, null},
-                {null, null, null, null, null}
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null}
             },
             new String [] {
-                "No", "Tugas", "Matkul", "Deadline", "Action"
+                "No", "Tugas", "Matkul", "Deadline"
             }
         ));
+        tugasTB.setEditingColumn(0);
         tugasTB.setFocusable(false);
         tugasTB.setShowGrid(false);
         tugasTB.setShowHorizontalLines(true);
         tugasTB.getTableHeader().setReorderingAllowed(false);
+        tugasTB.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                tugasTBMouseClicked(evt);
+            }
+        });
         jScrollPane1.setViewportView(tugasTB);
 
         jPanel1.add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 160, 640, 230));
@@ -185,24 +310,24 @@ public class mainMenu extends javax.swing.JFrame {
         sortingButton.setText("Sort By...");
         jPanel1.add(sortingButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(590, 120, 80, 20));
 
-        srch.setForeground(new java.awt.Color(153, 153, 153));
-        srch.setText("Search");
-        srch.addMouseListener(new java.awt.event.MouseAdapter() {
+        search.setForeground(new java.awt.Color(153, 153, 153));
+        search.setText("Search");
+        search.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
-                srchMouseClicked(evt);
+                searchMouseClicked(evt);
             }
         });
-        srch.addActionListener(new java.awt.event.ActionListener() {
+        search.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                srchActionPerformed(evt);
+                searchActionPerformed(evt);
             }
         });
-        srch.addKeyListener(new java.awt.event.KeyAdapter() {
+        search.addKeyListener(new java.awt.event.KeyAdapter() {
             public void keyTyped(java.awt.event.KeyEvent evt) {
-                srchKeyTyped(evt);
+                searchKeyTyped(evt);
             }
         });
-        jPanel1.add(srch, new org.netbeans.lib.awtextra.AbsoluteConstraints(450, 120, 130, -1));
+        jPanel1.add(search, new org.netbeans.lib.awtextra.AbsoluteConstraints(450, 120, 130, -1));
 
         jLabel2.setFont(new java.awt.Font("SansSerif", 1, 13)); // NOI18N
         jLabel2.setText("Daftar Tugas");
@@ -210,15 +335,6 @@ public class mainMenu extends javax.swing.JFrame {
 
         jLabel3.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/daftartugas.png"))); // NOI18N
         jPanel1.add(jLabel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 70, -1, -1));
-
-        editButton.setBackground(new java.awt.Color(255, 234, 133));
-        editButton.setText("Edit");
-        editButton.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                editButtonActionPerformed(evt);
-            }
-        });
-        jPanel1.add(editButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(150, 120, -1, -1));
 
         getContentPane().add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 700, 400));
 
@@ -231,17 +347,17 @@ public class mainMenu extends javax.swing.JFrame {
         dispose();
     }//GEN-LAST:event_buttonAddTaskActionPerformed
 
-    private void srchActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_srchActionPerformed
+    private void searchActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_searchActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_srchActionPerformed
+    }//GEN-LAST:event_searchActionPerformed
 
-    private void srchMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_srchMouseClicked
-        srch.setText("");
-    }//GEN-LAST:event_srchMouseClicked
+    private void searchMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_searchMouseClicked
+        search.setText("");
+    }//GEN-LAST:event_searchMouseClicked
 
-    private void srchKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_srchKeyTyped
+    private void searchKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_searchKeyTyped
        pencarian();
-    }//GEN-LAST:event_srchKeyTyped
+    }//GEN-LAST:event_searchKeyTyped
 
     private void userButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_userButtonActionPerformed
         Setting menu = new Setting(this, true, this);
@@ -251,12 +367,35 @@ public class mainMenu extends javax.swing.JFrame {
         int y = p.y + userButton.getHeight();
         menu.setLocation(x,y);
         menu.setVisible(true);
+        dispose();
     }//GEN-LAST:event_userButtonActionPerformed
 
-    private void editButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_editButtonActionPerformed
-            new taskMainMenu().setVisible(true);
-            dispose(); 
-    }//GEN-LAST:event_editButtonActionPerformed
+    private void tugasTBMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tugasTBMouseClicked
+        // TODO add your handling code here:
+        if (evt.getClickCount() == 2) {
+            int dataTerpilih = tugasTB.getSelectedRow();
+            if (dataTerpilih != -1) {
+                taskName = (String) tugasTB.getValueAt(dataTerpilih, 1);
+                
+                try (Connection conn = DBConnection.konek()) {
+                    // int PenggunaID = CekUser.fetchUserId(conn, currentUser, namaLabel);
+                    int taskID = CekTugas.fetchIdTugas(conn, taskName);
+        
+                    if (taskID != -1) {
+                        // Debug
+                        // System.out.println("ID Pengguna: " + PenggunaID);
+                        // System.out.println("ID Tugas: " + taskID);
+
+                        taskMainMenu editTask = new taskMainMenu(currentUser, taskId, taskName);    
+                        editTask.setVisible(true);
+                        dispose(); 
+                    }
+                } catch (SQLException | ClassNotFoundException e) {
+                    ErrorHandler.eHandler(e, "Error during task fetching!");
+                }
+            }
+        }
+    }//GEN-LAST:event_tugasTBMouseClicked
 
     /**
      * @param args the command line arguments
@@ -285,81 +424,16 @@ public class mainMenu extends javax.swing.JFrame {
         }
         //</editor-fold>
         //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
 
         /* Create and display the form */
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                new mainMenu().setVisible(true);
-            }
+        java.awt.EventQueue.invokeLater(() -> {
+            new mainMenu().setVisible(true);
         });
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton buttonAddTask;
     private com.raven.datechooser.DateChooser dateChooser;
-    private javax.swing.JButton editButton;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
@@ -367,8 +441,8 @@ public class mainMenu extends javax.swing.JFrame {
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JLabel namaLabel;
     private javax.swing.JPanel navBar;
+    private javax.swing.JTextField search;
     private javax.swing.JButton sortingButton;
-    private javax.swing.JTextField srch;
     private javax.swing.JLabel tanggal;
     private javax.swing.JTable tugasTB;
     private javax.swing.JButton userButton;

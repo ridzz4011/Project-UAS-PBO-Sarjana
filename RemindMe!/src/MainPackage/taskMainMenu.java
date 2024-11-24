@@ -4,6 +4,16 @@
  */
 package MainPackage;
 
+import EventHandler.CekUser;
+import EventHandler.CekTugas;
+import EventHandler.DBConnection;
+import EventHandler.ErrorHandler;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import javax.swing.JOptionPane;
+
 /**
  *
  * @author soery
@@ -11,10 +21,38 @@ package MainPackage;
 public class taskMainMenu extends javax.swing.JFrame {
 
     private String currentUser;
+    private int taskId;
+    private String taskName;
     
-    public taskMainMenu(String currentUser) {
+    public taskMainMenu(String currentUser, int taskId, String taskName) {
         this.currentUser = currentUser; // Simpan data user yang login
+        this.taskId = taskId;
+        this.taskName = taskName;
         initComponents();
+        
+        try (Connection conn = DBConnection.konek()) {
+            CekUser.fetchUserId(conn, currentUser, namaLabel);
+            int tugasID = CekTugas.fetchIdTugas(conn, taskName);
+            String sql = "SELECT * FROM tugas WHERE idTugas = ?";
+            try (PreparedStatement pstmt1 = conn.prepareStatement(sql)) {
+                pstmt1.setInt(1, tugasID);
+                ResultSet rs = pstmt1.executeQuery();
+                
+                if (rs.next()) {
+                    String namaTask = rs.getString("namaTugas");
+                    String Deskripsi = rs.getString("deskripsi");
+                    String DeadlineTugas = rs.getString("deadlineTugas");
+                    String NamaMatkul = rs.getString("namaMatkul");
+                    
+                    fNamaTugas.setText(namaTask);
+                    fNamaMatkul.setText(NamaMatkul);
+                    fDeadline.setText(DeadlineTugas);        
+                    tDeskripsi.setText(Deskripsi);
+                }
+            }
+        } catch (SQLException | ClassNotFoundException e) {
+            ErrorHandler.eHandler(e, "Gagal terhubung ke database!");
+        }
     }
     
     public taskMainMenu() {
@@ -37,14 +75,14 @@ public class taskMainMenu extends javax.swing.JFrame {
         reminderButton = new javax.swing.JButton();
         saveButton = new javax.swing.JButton();
         fDeadline = new javax.swing.JTextField();
-        fTaskName = new javax.swing.JTextField();
-        fMatkulName = new javax.swing.JTextField();
+        fNamaTugas = new javax.swing.JTextField();
+        fNamaMatkul = new javax.swing.JTextField();
         labelDescription = new javax.swing.JLabel();
         labelTugasName = new javax.swing.JLabel();
         labelMatkulName = new javax.swing.JLabel();
         labelDeadline = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
-        tDescription = new javax.swing.JTextArea();
+        tDeskripsi = new javax.swing.JTextArea();
         deleteButton1 = new javax.swing.JButton();
         kalenderButton = new javax.swing.JButton();
         jLabel2 = new javax.swing.JLabel();
@@ -102,6 +140,11 @@ public class taskMainMenu extends javax.swing.JFrame {
         saveButton.setText("Save");
         saveButton.setBorder(null);
         saveButton.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        saveButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                saveButtonActionPerformed(evt);
+            }
+        });
         jPanel1.add(saveButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(450, 330, 50, 30));
 
         fDeadline.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(204, 204, 204)));
@@ -112,33 +155,33 @@ public class taskMainMenu extends javax.swing.JFrame {
         });
         jPanel1.add(fDeadline, new org.netbeans.lib.awtextra.AbsoluteConstraints(170, 110, 290, 20));
 
-        fTaskName.setText("Isi Nama Tugas");
-        fTaskName.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(204, 204, 204)));
-        fTaskName.addMouseListener(new java.awt.event.MouseAdapter() {
+        fNamaTugas.setText("Isi Nama Tugas");
+        fNamaTugas.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(204, 204, 204)));
+        fNamaTugas.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
-                fTaskNameMouseClicked(evt);
+                fNamaTugasMouseClicked(evt);
             }
         });
-        fTaskName.addActionListener(new java.awt.event.ActionListener() {
+        fNamaTugas.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                fTaskNameActionPerformed(evt);
+                fNamaTugasActionPerformed(evt);
             }
         });
-        jPanel1.add(fTaskName, new org.netbeans.lib.awtextra.AbsoluteConstraints(170, 50, 340, 20));
+        jPanel1.add(fNamaTugas, new org.netbeans.lib.awtextra.AbsoluteConstraints(170, 50, 340, 20));
 
-        fMatkulName.setText("Masukkan Nama Mata Kuliah");
-        fMatkulName.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(204, 204, 204)));
-        fMatkulName.addMouseListener(new java.awt.event.MouseAdapter() {
+        fNamaMatkul.setText("Masukkan Nama Mata Kuliah");
+        fNamaMatkul.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(204, 204, 204)));
+        fNamaMatkul.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
-                fMatkulNameMouseClicked(evt);
+                fNamaMatkulMouseClicked(evt);
             }
         });
-        fMatkulName.addActionListener(new java.awt.event.ActionListener() {
+        fNamaMatkul.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                fMatkulNameActionPerformed(evt);
+                fNamaMatkulActionPerformed(evt);
             }
         });
-        jPanel1.add(fMatkulName, new org.netbeans.lib.awtextra.AbsoluteConstraints(170, 80, 340, 20));
+        jPanel1.add(fNamaMatkul, new org.netbeans.lib.awtextra.AbsoluteConstraints(170, 80, 340, 20));
 
         labelDescription.setFont(new java.awt.Font("Segoe UI Semibold", 0, 12)); // NOI18N
         labelDescription.setText("Deskripsi         : ");
@@ -156,11 +199,16 @@ public class taskMainMenu extends javax.swing.JFrame {
         labelDeadline.setText("Deadline         : ");
         jPanel1.add(labelDeadline, new org.netbeans.lib.awtextra.AbsoluteConstraints(80, 110, 80, 20));
 
-        tDescription.setColumns(20);
-        tDescription.setFont(new java.awt.Font("Times New Roman", 0, 12)); // NOI18N
-        tDescription.setRows(5);
-        tDescription.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(255, 255, 255)));
-        jScrollPane1.setViewportView(tDescription);
+        tDeskripsi.setColumns(20);
+        tDeskripsi.setFont(new java.awt.Font("Times New Roman", 0, 12)); // NOI18N
+        tDeskripsi.setRows(5);
+        tDeskripsi.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(255, 255, 255)));
+        tDeskripsi.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                tDeskripsiMouseClicked(evt);
+            }
+        });
+        jScrollPane1.setViewportView(tDeskripsi);
 
         jPanel1.add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(170, 140, 340, 180));
 
@@ -169,6 +217,11 @@ public class taskMainMenu extends javax.swing.JFrame {
         deleteButton1.setText("Delete");
         deleteButton1.setBorder(null);
         deleteButton1.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        deleteButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                deleteButton1ActionPerformed(evt);
+            }
+        });
         jPanel1.add(deleteButton1, new org.netbeans.lib.awtextra.AbsoluteConstraints(390, 330, 50, 30));
 
         kalenderButton.setBackground(new java.awt.Color(121, 134, 199));
@@ -263,41 +316,111 @@ public class taskMainMenu extends javax.swing.JFrame {
         dateChooser.showPopup();
     }//GEN-LAST:event_kalenderButtonActionPerformed
 
-    private void fTaskNameActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_fTaskNameActionPerformed
+    private void fNamaTugasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_fNamaTugasActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_fTaskNameActionPerformed
+        
+    }//GEN-LAST:event_fNamaTugasActionPerformed
 
-    private void fMatkulNameActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_fMatkulNameActionPerformed
+    private void fNamaMatkulActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_fNamaMatkulActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_fMatkulNameActionPerformed
+    }//GEN-LAST:event_fNamaMatkulActionPerformed
 
     private void userButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_userButtonActionPerformed
-        formProfile profilePage = new formProfile(currentUser);
-        profilePage.setVisible(true);
-        dispose();
+        //
     }//GEN-LAST:event_userButtonActionPerformed
 
-    private void fTaskNameMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_fTaskNameMouseClicked
-        fTaskName.setText("");
-    }//GEN-LAST:event_fTaskNameMouseClicked
+    private void fNamaTugasMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_fNamaTugasMouseClicked
+        fNamaTugas.setText("");
+    }//GEN-LAST:event_fNamaTugasMouseClicked
 
-    private void fMatkulNameMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_fMatkulNameMouseClicked
-        fMatkulName.setText("");
-    }//GEN-LAST:event_fMatkulNameMouseClicked
+    private void fNamaMatkulMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_fNamaMatkulMouseClicked
+        fNamaMatkul.setText("");
+    }//GEN-LAST:event_fNamaMatkulMouseClicked
 
     private void fDeadlineMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_fDeadlineMouseClicked
         fDeadline.setText("");
     }//GEN-LAST:event_fDeadlineMouseClicked
 
     private void reminderButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_reminderButtonActionPerformed
-          new setReminder().setVisible(true);
+       setReminder setReminderPage = new setReminder(currentUser, taskId);   
+       setReminderPage.setVisible(true);
        dispose();
     }//GEN-LAST:event_reminderButtonActionPerformed
 
     private void backButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_backButtonActionPerformed
-        new mainMenu().setVisible(true);
+       mainMenu menuPage = new mainMenu(currentUser);
+       menuPage.setVisible(true);
        dispose(); 
     }//GEN-LAST:event_backButtonActionPerformed
+
+    private void saveButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_saveButtonActionPerformed
+        // TODO add your handling code here:
+        // String query = "UPDATE tugas SET namaTugas = ?, deskripsi = ?, deadlineTugas = ?, namaMatkul = ? WHERE idTugas = ? AND idPengguna = ?";
+        String query = "UPDATE tugas SET namaTugas = ?, namaMatkul = ?, deadlineTugas = ?, deskripsi = ? WHERE idTugas = ?";
+        
+        String NamaTugas = fNamaTugas.getText();
+        String NamaMatkul = fNamaMatkul.getText();
+        String Deadline = fDeadline.getText();
+        String Deskripsi = tDeskripsi.getText();
+        
+        try (Connection conn = DBConnection.konek()) {
+            
+            try (PreparedStatement pstmt3 = conn.prepareStatement(query)) {
+                // int userID = CekUser.fetchUserId(conn, currentUser, namaLabel);
+                int taskID = CekTugas.fetchIdTugas(conn, taskName);
+                
+                pstmt3.setString(1, NamaTugas);
+                pstmt3.setString(2, NamaMatkul);
+                pstmt3.setString(3, Deadline);
+                pstmt3.setString(4, Deskripsi);
+                // pstmt3.setInt(5, userID);
+                pstmt3.setInt(5, taskID);
+                
+                int resultSet = pstmt3.executeUpdate();
+                
+                if (resultSet > 0) {
+                    JOptionPane.showMessageDialog(null, "Berhasil mengubah Tugas!");
+                } else {
+                    JOptionPane.showMessageDialog(null, "Gagal mengubah Tugas!", "Error", JOptionPane.ERROR_MESSAGE);
+                }
+            }
+        } catch (SQLException | ClassNotFoundException e) {
+            ErrorHandler.eHandler(e, "Gagal menambahkan tugas ke Database!");
+        }
+    }//GEN-LAST:event_saveButtonActionPerformed
+
+    private void tDeskripsiMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tDeskripsiMouseClicked
+        // TODO add your handling code here:
+        tDeskripsi.setText("");
+    }//GEN-LAST:event_tDeskripsiMouseClicked
+
+    private void deleteButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_deleteButton1ActionPerformed
+        // TODO add your handling code here:
+        String query = "DELETE FROM tugas where idTugas = ? AND idPengguna = ?";
+        
+        try (Connection conn = DBConnection.konek()) {
+            try (PreparedStatement pstmt = conn.prepareStatement(query)) {
+                int userID = CekUser.fetchUserId(conn, currentUser, namaLabel);
+                int taskID = CekTugas.fetchIdTugas(conn, taskName);
+                
+                pstmt.setInt(1, taskID);
+                pstmt.setInt(2, userID);
+                
+                int resultSet = pstmt.executeUpdate();
+                
+                if (resultSet > 0) {
+                    JOptionPane.showMessageDialog(null, "Berhasil menghapus Tugas!");
+                    mainMenu menuPage = new mainMenu(currentUser);
+                    menuPage.setVisible(true);
+                    dispose();
+                } else {
+                    JOptionPane.showMessageDialog(null, "Gagal menghapus Tugas!", "Error", JOptionPane.ERROR_MESSAGE);
+                }
+            }
+        } catch (SQLException | ClassNotFoundException e) {
+            ErrorHandler.eHandler(e, "Gagal menghapus tugas ke Database!");
+        }
+    }//GEN-LAST:event_deleteButton1ActionPerformed
 
     /**
      * @param args the command line arguments
@@ -326,516 +449,6 @@ public class taskMainMenu extends javax.swing.JFrame {
         }
         //</editor-fold>
         //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
 
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
@@ -850,8 +463,8 @@ public class taskMainMenu extends javax.swing.JFrame {
     private com.raven.datechooser.DateChooser dateChooser;
     private javax.swing.JButton deleteButton1;
     private javax.swing.JTextField fDeadline;
-    private javax.swing.JTextField fMatkulName;
-    private javax.swing.JTextField fTaskName;
+    private javax.swing.JTextField fNamaMatkul;
+    private javax.swing.JTextField fNamaTugas;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
@@ -868,7 +481,7 @@ public class taskMainMenu extends javax.swing.JFrame {
     private javax.swing.JButton reminderButton;
     private javax.swing.JButton saveButton;
     private javax.swing.JPanel sideBar;
-    private javax.swing.JTextArea tDescription;
+    private javax.swing.JTextArea tDeskripsi;
     private javax.swing.JLabel tanggal;
     private javax.swing.JButton userButton;
     // End of variables declaration//GEN-END:variables
