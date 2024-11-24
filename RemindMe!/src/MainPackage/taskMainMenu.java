@@ -342,7 +342,7 @@ public class taskMainMenu extends javax.swing.JFrame {
     }//GEN-LAST:event_fDeadlineMouseClicked
 
     private void reminderButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_reminderButtonActionPerformed
-       setReminder setReminderPage = new setReminder(currentUser, taskId);   
+       setReminder setReminderPage = new setReminder(currentUser);   
        setReminderPage.setVisible(true);
        dispose();
     }//GEN-LAST:event_reminderButtonActionPerformed

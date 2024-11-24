@@ -22,6 +22,9 @@ import EventHandler.CekTugas;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.text.ParseException;
+import java.util.concurrent.TimeUnit;
+
 import java.sql.SQLException;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
@@ -33,6 +36,7 @@ import javax.swing.table.DefaultTableModel;
 public class mainMenu extends javax.swing.JFrame {
     private Timer timer;
     private String currentUser;
+    private String currentDateTime;
     private int taskId;
     private String taskName;
     
@@ -50,17 +54,14 @@ public class mainMenu extends javax.swing.JFrame {
             } else {
                 tugasTB.getTableHeader().setOpaque(false);
                 tugasTB.getTableHeader().setBackground(new Color(255,234,133));
+                
+                showDayDateTime();
         
-                //MEnampilkan waktu
-                timer = new Timer(1000,new ActionListener() {
-        
-                    public void actionPerformed(ActionEvent e) {
-                        showDayDateTime();
-                    }
-                }
-                );
-
-                timer.start(); 
+                Timer timerNotif = new Timer(1000, (ActionEvent e) -> {
+                    sentReminderNotification();
+                });
+                
+                timerNotif.start();
         
                 tampilkanData();
             }    
@@ -95,19 +96,72 @@ public class mainMenu extends javax.swing.JFrame {
     }
     
      private void showDayDateTime(){
-        Calendar calendar = Calendar.getInstance();
-        Date now = new Date();
-        SimpleDateFormat formatHari = new SimpleDateFormat("EEEE", new Locale("in", "ID"));
-        SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
-        String hari = formatHari.format(calendar.getTime());
-        String dateTime = dateFormat.format(now);
-        tanggal.setText(hari+", "+dateTime);
+        timer = new Timer(1000, e -> {
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            currentDateTime = sdf.format(new Date());
+            tanggal.setText(currentDateTime); // Update label dengan waktu sekarang
+         });
+         timer.start(); // Mulai timer
     }
+     
+     private void sentReminderNotification() {
+            try (Connection conn = DBConnection.konek()) {
+            SimpleDateFormat dateTimeFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
+            String getDeadline = "SELECT idReminder, idTugas, dateTime "
+                                + "FROM pengingat "
+                                + "WHERE statusNotif = 0 AND dateTime <= ? "
+                                + "ORDER BY dateTime ASC LIMIT 1";
+            PreparedStatement pstmtDL = conn.prepareStatement(getDeadline);
+            pstmtDL.setString(1, currentDateTime);
+            ResultSet rsDL = pstmtDL.executeQuery();
+
+            if (rsDL.next()) {
+                int reminderID = rsDL.getInt("idReminder");
+                int tugasID = rsDL.getInt("idTugas");
+                String deadline = rsDL.getString("dateTime");
+
+                String getNamaTugas = "SELECT namaTugas FROM tugas WHERE idTugas = ?";
+                PreparedStatement ptsmtNT = conn.prepareStatement(getNamaTugas);
+                ptsmtNT.setInt(1, tugasID);
+                ResultSet rsNT = ptsmtNT.executeQuery();
+
+                String namaTugas = "";
+                if (rsNT.next()) {
+                    namaTugas = rsNT.getString("namaTugas");
+                }
+
+                // Periksa apakah waktu sekarang berada dalam 1 menit dari deadline
+                Date currentDate = dateTimeFormat.parse(currentDateTime);
+                Date deadlineDate = dateTimeFormat.parse(deadline);
+
+                long diffInMillies = Math.abs(deadlineDate.getTime() - currentDate.getTime());
+                long diffInMinutes = TimeUnit.MINUTES.convert(diffInMillies, TimeUnit.MILLISECONDS);
+
+                if (deadlineDate != null && new Date().after(currentDate)) {
+                    JOptionPane.showMessageDialog(this, 
+                    String.format("Pengingat untuk tugas '%s' telah tiba!", namaTugas),
+                                "Pengingat Tugas", JOptionPane.INFORMATION_MESSAGE);
+
+                    String updateStatus = "UPDATE pengingat SET statusNotif = 1 WHERE IdReminder = ?";
+                    try (PreparedStatement ptsmtUS = conn.prepareStatement(updateStatus)) {
+                    ptsmtUS.setInt(1, reminderID);
+                    ptsmtUS.executeUpdate();
+                    }
+                }
+
+            }
+        } catch (SQLException | ClassNotFoundException | ParseException e) {
+            ErrorHandler.eHandler(e, "Error!");
+        }
+     }
      
      private void pencarian(){
         // Membersihkan data di table
         DefaultTableModel tableTugas = (DefaultTableModel) tugasTB.getModel();
         tableTugas.setRowCount(0);
+        
+        String cari = searchField.getText().trim();
         
         try (Connection conn = DBConnection.konek()) {
             int userID = CekUser.fetchUserId(conn, currentUser, namaLabel);
@@ -119,8 +173,8 @@ public class mainMenu extends javax.swing.JFrame {
             PreparedStatement pstmt2 = conn.prepareStatement(query);
 
             pstmt2.setInt(1, userID);
-            pstmt2.setString(2, "%" + search + "%"); // Tambahkan wildcard % untuk LIKE
-            pstmt2.setString(3, "%" + search + "%");
+            pstmt2.setString(2, "%" + cari + "%"); // Tambahkan wildcard % untuk LIKE
+            pstmt2.setString(3, "%" + cari + "%");
 
             ResultSet rs2 = pstmt2.executeQuery();
 
@@ -130,8 +184,8 @@ public class mainMenu extends javax.swing.JFrame {
                 String[] baris = {
                     String.valueOf(no),              // Nomor urut
                     rs2.getString("namaTugas"),      // Nama Tugas
-                    rs2.getString("namaMatkul"),     // Nama Mata Kuliah
-                    rs2.getString("deadlineTugas")   // Deadline
+                    rs2.getString("deadlineTugas"),  // Deadline
+                    rs2.getString("namaMatkul")      // Nama Matkul
                 };
                 tableTugas.addRow(baris);
                 no++;
@@ -203,8 +257,8 @@ public class mainMenu extends javax.swing.JFrame {
         buttonAddTask = new javax.swing.JButton();
         jScrollPane1 = new javax.swing.JScrollPane();
         tugasTB = new javax.swing.JTable();
-        sortingButton = new javax.swing.JButton();
-        search = new javax.swing.JTextField();
+        sortButton = new javax.swing.JButton();
+        searchField = new javax.swing.JTextField();
         jLabel2 = new javax.swing.JLabel();
         jLabel3 = new javax.swing.JLabel();
 
@@ -306,28 +360,33 @@ public class mainMenu extends javax.swing.JFrame {
 
         jPanel1.add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 160, 640, 230));
 
-        sortingButton.setBackground(new java.awt.Color(255, 234, 133));
-        sortingButton.setText("Sort By...");
-        jPanel1.add(sortingButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(590, 120, 80, 20));
-
-        search.setForeground(new java.awt.Color(153, 153, 153));
-        search.setText("Search");
-        search.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                searchMouseClicked(evt);
-            }
-        });
-        search.addActionListener(new java.awt.event.ActionListener() {
+        sortButton.setBackground(new java.awt.Color(255, 234, 133));
+        sortButton.setText("Sort By...");
+        sortButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                searchActionPerformed(evt);
+                sortButtonActionPerformed(evt);
             }
         });
-        search.addKeyListener(new java.awt.event.KeyAdapter() {
+        jPanel1.add(sortButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(590, 120, 80, 20));
+
+        searchField.setForeground(new java.awt.Color(153, 153, 153));
+        searchField.setText("Search");
+        searchField.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                searchFieldMouseClicked(evt);
+            }
+        });
+        searchField.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                searchFieldActionPerformed(evt);
+            }
+        });
+        searchField.addKeyListener(new java.awt.event.KeyAdapter() {
             public void keyTyped(java.awt.event.KeyEvent evt) {
-                searchKeyTyped(evt);
+                searchFieldKeyTyped(evt);
             }
         });
-        jPanel1.add(search, new org.netbeans.lib.awtextra.AbsoluteConstraints(450, 120, 130, -1));
+        jPanel1.add(searchField, new org.netbeans.lib.awtextra.AbsoluteConstraints(450, 120, 130, -1));
 
         jLabel2.setFont(new java.awt.Font("SansSerif", 1, 13)); // NOI18N
         jLabel2.setText("Daftar Tugas");
@@ -347,17 +406,17 @@ public class mainMenu extends javax.swing.JFrame {
         dispose();
     }//GEN-LAST:event_buttonAddTaskActionPerformed
 
-    private void searchActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_searchActionPerformed
+    private void searchFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_searchFieldActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_searchActionPerformed
+    }//GEN-LAST:event_searchFieldActionPerformed
 
-    private void searchMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_searchMouseClicked
-        search.setText("");
-    }//GEN-LAST:event_searchMouseClicked
+    private void searchFieldMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_searchFieldMouseClicked
+        searchField.setText("");
+    }//GEN-LAST:event_searchFieldMouseClicked
 
-    private void searchKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_searchKeyTyped
+    private void searchFieldKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_searchFieldKeyTyped
        pencarian();
-    }//GEN-LAST:event_searchKeyTyped
+    }//GEN-LAST:event_searchFieldKeyTyped
 
     private void userButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_userButtonActionPerformed
         Setting menu = new Setting(this, true, this);
@@ -396,6 +455,43 @@ public class mainMenu extends javax.swing.JFrame {
             }
         }
     }//GEN-LAST:event_tugasTBMouseClicked
+
+    private void sortButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_sortButtonActionPerformed
+        // TODO add your handling code here:
+        DefaultTableModel tableTugas = (DefaultTableModel) tugasTB.getModel();
+        tableTugas.setRowCount(0);
+        
+        try (Connection conn = DBConnection.konek()) {
+            int userID = CekUser.fetchUserId(conn, currentUser, namaLabel);
+            
+            // Query untuk pencarian berdasarkan namaTugas atau namaMatkul
+            String query = "SELECT namaTugas, deadlineTugas, namaMatkul "
+                     + "FROM tugas "
+                     + "WHERE idPengguna = ? "
+                     + "ORDER BY deadlineTugas ASC"; // Urutkan berdasarkan deadline
+            PreparedStatement pstmt2 = conn.prepareStatement(query);
+
+            pstmt2.setInt(1, userID);
+
+            ResultSet rs2 = pstmt2.executeQuery();
+
+            // Tambahkan data yang ditemukan ke tabel
+            int no = 1;
+            while (rs2.next()) {
+                String[] baris = {
+                    String.valueOf(no),             // Nomor urut
+                    rs2.getString("namaTugas"),     // Nama Tugas
+                    rs2.getString("deadlineTugas"), // Deadline
+                    rs2.getString("namaMatkul")     // Nama Mata Kuliah
+                };
+                tableTugas.addRow(baris);
+                no++;
+            }
+
+        } catch (SQLException | ClassNotFoundException e) {
+            ErrorHandler.eHandler(e, "Gagal mengambil data dari database!");
+        }
+    }//GEN-LAST:event_sortButtonActionPerformed
 
     /**
      * @param args the command line arguments
@@ -441,8 +537,8 @@ public class mainMenu extends javax.swing.JFrame {
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JLabel namaLabel;
     private javax.swing.JPanel navBar;
-    private javax.swing.JTextField search;
-    private javax.swing.JButton sortingButton;
+    private javax.swing.JTextField searchField;
+    private javax.swing.JButton sortButton;
     private javax.swing.JLabel tanggal;
     private javax.swing.JTable tugasTB;
     private javax.swing.JButton userButton;
