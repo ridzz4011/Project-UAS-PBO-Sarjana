@@ -143,7 +143,7 @@ public class formRegister extends javax.swing.JFrame {
                 checkAvailabilityButtonActionPerformed(evt);
             }
         });
-        jPanel1.add(checkAvailabilityButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(550, 130, 40, 40));
+        jPanel1.add(checkAvailabilityButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(560, 140, 30, 20));
 
         fieldUser.setBackground(new java.awt.Color(246, 246, 246));
         fieldUser.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(255, 255, 255)));
@@ -169,7 +169,7 @@ public class formRegister extends javax.swing.JFrame {
         jPanel1.add(fieldConfirmPass, new org.netbeans.lib.awtextra.AbsoluteConstraints(330, 220, 220, 20));
 
         BGRegister.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/2.png"))); // NOI18N
-        jPanel1.add(BGRegister, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, -20, 290, 370));
+        jPanel1.add(BGRegister, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, -10, 290, 350));
 
         registerButton.setBackground(new java.awt.Color(255, 234, 133));
         registerButton.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
@@ -184,7 +184,7 @@ public class formRegister extends javax.swing.JFrame {
         words1.setFont(new java.awt.Font("Times New Roman", 2, 12)); // NOI18N
         words1.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
         words1.setText("Already have Account?");
-        jPanel1.add(words1, new org.netbeans.lib.awtextra.AbsoluteConstraints(330, 290, 120, 20));
+        jPanel1.add(words1, new org.netbeans.lib.awtextra.AbsoluteConstraints(380, 290, 120, 20));
 
         loginnButton.setBackground(new java.awt.Color(230, 194, 65));
         loginnButton.setFont(new java.awt.Font("Times New Roman", 2, 12)); // NOI18N
@@ -202,9 +202,9 @@ public class formRegister extends javax.swing.JFrame {
                 loginnButtonActionPerformed(evt);
             }
         });
-        jPanel1.add(loginnButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(430, 290, 60, 20));
+        jPanel1.add(loginnButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(480, 290, 60, 20));
 
-        getContentPane().add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 620, 360));
+        getContentPane().add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 620, -1));
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
@@ -307,7 +307,7 @@ public class formRegister extends javax.swing.JFrame {
          */
         try {
             for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
+                if ("windows".equals(info.getName())) {
                     javax.swing.UIManager.setLookAndFeel(info.getClassName());
                     break;
                 }

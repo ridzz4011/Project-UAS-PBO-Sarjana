@@ -5,7 +5,19 @@
 package MainPackage;
 
 import Custom.Setting;
+import DatabaseConnection.DBConnection;
 import java.awt.Point;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import javax.swing.Timer;
+import javax.swing.JOptionPane;
+import java.util.Locale;
+import java.text.ParseException;
+import java.sql.ResultSet;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+
 
 /**
  *
@@ -16,16 +28,132 @@ public class setReminder extends javax.swing.JFrame {
     /**
      * Creates new form setReminder
      */
-     private String currentUser;
+    private Timer timer;
+    private static String currentUser;
+    private Date reminderDateTime;
     
     public setReminder(String currentUser) {
-        this.currentUser = currentUser; // Simpan data user yang login
+        setReminder.currentUser = currentUser; // Simpan data user yang login
         initComponents();
+        namaUser();
+        startDateTimeUpdater();
     }
     
-    public setReminder() {
-        initComponents();
+    private void namaUser(){
+        try (Connection conn = DBConnection.konek()) {
+            String getID = "SELECT idPengguna, namaPengguna FROM pengguna WHERE username = ?";
+            PreparedStatement pstmt1 = conn.prepareStatement(getID);           
+            pstmt1.setString(1, currentUser);
+            ResultSet rs1 = pstmt1.executeQuery();
+
+            int userID = 0; // Default jika id tidak ditemukan
+                String namaLengkap;
+                if (rs1.next()) {
+                    userID = rs1.getInt("idPengguna"); // Ambil nilai idPengguna
+                    namaLengkap = rs1.getString("namaPengguna");
+                    namaLabel.setText(namaLengkap);
+                } else {
+                    JOptionPane.showMessageDialog(null, "ID Pengguna Tidak ditemukan", "ID NOT FOUND", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+        }catch (SQLException | ClassNotFoundException e) {
+            
+        }
     }
+    
+    private void startDateTimeUpdater() {
+        timer = new Timer(1000, e -> {
+            SimpleDateFormat sdf = new SimpleDateFormat("EEEE, dd MMMM yyyy HH:mm:ss",  new Locale("in", "ID"));
+            String currentDateTime = sdf.format(new Date());
+            tanggal.setText(currentDateTime); // Update label dengan waktu sekarang
+
+            // Cek apakah waktu pengingat sudah tercapai
+            if (reminderDateTime != null && new Date().after(reminderDateTime)) {
+                showReminderNotification();
+            }
+        });
+        timer.start(); // Mulai timer
+    }
+    
+    private void showReminderNotification() {
+        // Menampilkan notifikasi ketika waktu pengingat tercapai
+        JOptionPane.showMessageDialog(this, "Hello... Waktu Pengingat Sudah Tiba!", 
+                                      "Pengingat Tugas", JOptionPane.INFORMATION_MESSAGE);
+        reminderDateTime = null;  // Set reminderDateTime ke null untuk mencegah notifikasi berulang
+    }
+
+    @Override
+    public void dispose() {
+        if (timer != null) {
+            timer.stop();
+        }
+        super.dispose();
+    }
+        
+    private void saveReminder() {
+        try {
+            // Ambil input nama tugas, tanggal, dan waktu dari pengguna
+            String namaTugas = namaTugasField.getText(); // Masukan nama tugas
+            String dateInput = dateField.getText(); // Format input: yyyy-MM-dd
+            String timeInput = timeField.getText(); // Format input: HH:mm:ss
+
+            // Validasi input
+            if (dateInput.isEmpty() || timeInput.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "Tanggal dan waktu tidak boleh kosong.");
+                return;
+            }
+
+            // Validasi format tanggal dan waktu
+            SimpleDateFormat dateTimeFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            dateTimeFormat.setLenient(false);
+
+            String reminderDatetimeString = dateInput + " " + timeInput;
+            reminderDateTime = dateTimeFormat.parse(reminderDatetimeString); // Parsing String ke Date
+
+            Date currentDate = new Date(); // Dapatkan waktu sekarang
+            if (reminderDateTime.before(currentDate)) {
+                JOptionPane.showMessageDialog(this, "Waktu sudah Terlewat!", "Invalid Time", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+            // Simpan ke database
+            Connection conn = DBConnection.konek(); // Panggil koneksi dari DBConnection
+            
+            String getID = "SELECT idPengguna, namaPengguna FROM pengguna WHERE username = ?";
+            PreparedStatement pstmt1 = conn.prepareStatement(getID);           
+            pstmt1.setString(1, currentUser);
+            ResultSet rs1 = pstmt1.executeQuery();
+            
+            String getIDT = "SELECT IdTugas FROM tugas WHERE namaTugas = ?";
+            PreparedStatement pstmtID = conn.prepareStatement(getIDT);
+            pstmtID.setString(1, namaTugas);
+            ResultSet rsID = pstmtID.executeQuery();
+            
+            int tugasID = -1;
+            if(rsID.next()){
+                tugasID = rsID.getInt("IdTugas");
+            }else{
+                JOptionPane.showMessageDialog(this, "ID Tugas Tidak ditemukan.", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+            
+            String sql = "INSERT INTO pengingat (IdTugas, dateTime) "
+                    + "VALUES (?, ?)";
+            PreparedStatement pstmt = conn.prepareStatement(sql);
+            pstmt.setInt(1, tugasID); // Masukkan namaTugas
+            pstmt.setString(2, reminderDatetimeString); // Masukkan reminder_datetime sebagai String
+            int rsRm = pstmt.executeUpdate();
+            
+            if (rsRm > 0) {
+                JOptionPane.showMessageDialog(this, "Pengingat berhasil disimpan!");
+            }
+
+            // Tutup koneksi
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, "Terjadi kesalahan: " + e.getMessage());
+        }
+    }
+
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -38,25 +166,20 @@ public class setReminder extends javax.swing.JFrame {
 
         kalenderButton = new javax.swing.JButton();
         jPanel1 = new javax.swing.JPanel();
-        dateTitle = new javax.swing.JLabel();
-        dateNow = new javax.swing.JLabel();
-        timeNow = new javax.swing.JLabel();
         dateTitle2 = new javax.swing.JLabel();
         timeTitle = new javax.swing.JLabel();
         dateField = new javax.swing.JTextField();
         timeField = new javax.swing.JTextField();
-        jButton3 = new javax.swing.JButton();
-        kalenderButton1 = new javax.swing.JButton();
+        setButton = new javax.swing.JButton();
         navBar = new javax.swing.JPanel();
         tanggal = new javax.swing.JLabel();
-        userButton = new javax.swing.JButton();
         namaLabel = new javax.swing.JLabel();
         jLabel1 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
-        jPanel2 = new javax.swing.JPanel();
-        dateChooser1 = new com.raven.datechooser.DateChooser();
         jLabel3 = new javax.swing.JLabel();
         backButton = new javax.swing.JButton();
+        namaTugasTitle = new javax.swing.JLabel();
+        namaTugasField = new javax.swing.JTextField();
 
         kalenderButton.setBackground(new java.awt.Color(153, 153, 153));
         kalenderButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/kalender.png"))); // NOI18N
@@ -70,13 +193,6 @@ public class setReminder extends javax.swing.JFrame {
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
         jPanel1.setBackground(new java.awt.Color(255, 255, 255));
-
-        dateTitle.setFont(new java.awt.Font("Segoe UI Semibold", 0, 12)); // NOI18N
-        dateTitle.setText("Datetime: ");
-
-        dateNow.setText("17/11/2024");
-
-        timeNow.setText("23:29");
 
         dateTitle2.setFont(new java.awt.Font("Segoe UI Semibold", 0, 12)); // NOI18N
         dateTitle2.setText("Date: ");
@@ -93,37 +209,19 @@ public class setReminder extends javax.swing.JFrame {
             }
         });
 
-        jButton3.setBackground(new java.awt.Color(255, 234, 133));
-        jButton3.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
-        jButton3.setText("Set");
-        jButton3.addActionListener(new java.awt.event.ActionListener() {
+        setButton.setBackground(new java.awt.Color(255, 234, 133));
+        setButton.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        setButton.setText("Set");
+        setButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton3ActionPerformed(evt);
-            }
-        });
-
-        kalenderButton1.setBackground(new java.awt.Color(121, 134, 199));
-        kalenderButton1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/kalender.png"))); // NOI18N
-        kalenderButton1.setBorder(null);
-        kalenderButton1.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                kalenderButton1ActionPerformed(evt);
+                setButtonActionPerformed(evt);
             }
         });
 
         navBar.setBackground(new java.awt.Color(255, 234, 133));
 
         tanggal.setForeground(new java.awt.Color(102, 102, 102));
-        tanggal.setText("Hari, Tanggal dan Waktu");
-
-        userButton.setBackground(new java.awt.Color(121, 134, 199));
-        userButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/user.png"))); // NOI18N
-        userButton.setBorder(null);
-        userButton.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                userButtonActionPerformed(evt);
-            }
-        });
+        tanggal.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
 
         namaLabel.setFont(new java.awt.Font("SansSerif", 1, 12)); // NOI18N
         namaLabel.setText("Nama Lengkap");
@@ -136,55 +234,31 @@ public class setReminder extends javax.swing.JFrame {
         navBarLayout.setHorizontalGroup(
             navBarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(navBarLayout.createSequentialGroup()
-                .addGroup(navBarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                .addGap(17, 17, 17)
+                .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 103, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGroup(navBarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(navBarLayout.createSequentialGroup()
-                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(tanggal))
-                    .addGroup(navBarLayout.createSequentialGroup()
-                        .addGap(17, 17, 17)
-                        .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 87, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(namaLabel)))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(userButton, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap())
+                        .addGap(179, 179, 179)
+                        .addComponent(namaLabel))
+                    .addComponent(tanggal, javax.swing.GroupLayout.PREFERRED_SIZE, 266, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(16, 16, 16))
         );
         navBarLayout.setVerticalGroup(
             navBarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(navBarLayout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(navBarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(navBarLayout.createSequentialGroup()
-                        .addGroup(navBarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(namaLabel)
-                            .addComponent(jLabel1))
+                        .addComponent(namaLabel)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(tanggal, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                    .addComponent(userButton, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
+                        .addComponent(tanggal, javax.swing.GroupLayout.DEFAULT_SIZE, 16, Short.MAX_VALUE)))
                 .addContainerGap())
         );
 
         jLabel2.setFont(new java.awt.Font("SansSerif", 1, 13)); // NOI18N
         jLabel2.setText("Set Reminder");
-
-        jPanel2.setBackground(new java.awt.Color(239, 235, 235));
-
-        javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
-        jPanel2.setLayout(jPanel2Layout);
-        jPanel2Layout.setHorizontalGroup(
-            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
-                .addContainerGap(72, Short.MAX_VALUE)
-                .addComponent(dateChooser1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(51, 51, 51))
-        );
-        jPanel2Layout.setVerticalGroup(
-            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel2Layout.createSequentialGroup()
-                .addContainerGap(113, Short.MAX_VALUE)
-                .addComponent(dateChooser1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(85, 85, 85))
-        );
 
         jLabel3.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/Reminder.png"))); // NOI18N
 
@@ -198,6 +272,11 @@ public class setReminder extends javax.swing.JFrame {
             }
         });
 
+        namaTugasTitle.setFont(new java.awt.Font("Segoe UI Semibold", 0, 12)); // NOI18N
+        namaTugasTitle.setText("Tugas:");
+
+        namaTugasField.setFont(new java.awt.Font("Times New Roman", 0, 12)); // NOI18N
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
@@ -206,79 +285,64 @@ public class setReminder extends javax.swing.JFrame {
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addGap(38, 38, 38)
+                        .addGap(16, 16, 16)
+                        .addComponent(backButton))
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addGap(224, 224, 224)
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(jPanel1Layout.createSequentialGroup()
                                 .addComponent(jLabel3)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                                 .addComponent(jLabel2))
-                            .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                                    .addComponent(jButton3, javax.swing.GroupLayout.PREFERRED_SIZE, 138, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addGap(42, 42, 42))
-                                .addGroup(jPanel1Layout.createSequentialGroup()
+                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                     .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                                         .addComponent(dateTitle2)
                                         .addComponent(timeTitle))
-                                    .addGap(27, 27, 27)
+                                    .addGroup(jPanel1Layout.createSequentialGroup()
+                                        .addGap(1, 1, 1)
+                                        .addComponent(namaTugasTitle)))
+                                .addGap(24, 24, 24)
+                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(namaTugasField, javax.swing.GroupLayout.PREFERRED_SIZE, 165, javax.swing.GroupLayout.PREFERRED_SIZE)
                                     .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                        .addComponent(timeField, javax.swing.GroupLayout.PREFERRED_SIZE, 165, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addGroup(jPanel1Layout.createSequentialGroup()
-                                            .addComponent(dateField, javax.swing.GroupLayout.PREFERRED_SIZE, 124, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                            .addGap(18, 18, 18)
-                                            .addComponent(kalenderButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE))))
-                                .addGroup(jPanel1Layout.createSequentialGroup()
-                                    .addGap(2, 2, 2)
-                                    .addComponent(dateTitle)
-                                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                    .addComponent(dateNow)
-                                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                    .addComponent(timeNow)))))
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addGap(16, 16, 16)
-                        .addComponent(backButton)))
-                .addGap(70, 70, 70)
-                .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                                        .addComponent(setButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                        .addComponent(timeField)
+                                        .addComponent(dateField, javax.swing.GroupLayout.PREFERRED_SIZE, 165, javax.swing.GroupLayout.PREFERRED_SIZE)))))))
+                .addGap(0, 275, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
-                .addComponent(navBar, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(47, 47, 47)
+                .addComponent(navBar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 91, Short.MAX_VALUE)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(jLabel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jLabel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addGap(37, 37, 37)
+                    .addComponent(jLabel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jLabel3))
+                .addGap(18, 18, 18)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(dateTitle)
-                    .addComponent(dateNow)
-                    .addComponent(timeNow))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(kalenderButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
+                    .addComponent(namaTugasTitle)
+                    .addComponent(namaTugasField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(13, 13, 13)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(dateTitle2)
                     .addComponent(dateField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(12, 12, 12)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(timeTitle)
                     .addComponent(timeField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(33, 33, 33)
-                .addComponent(jButton3)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(setButton)
+                .addGap(64, 64, 64)
                 .addComponent(backButton)
                 .addGap(14, 14, 14))
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                .addGap(0, 4, Short.MAX_VALUE)
-                .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -294,28 +358,13 @@ public class setReminder extends javax.swing.JFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_timeFieldActionPerformed
 
-    private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_jButton3ActionPerformed
+    private void setButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_setButtonActionPerformed
+        saveReminder();
+    }//GEN-LAST:event_setButtonActionPerformed
 
     private void kalenderButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_kalenderButtonActionPerformed
         //dateChooser.showPopup();
     }//GEN-LAST:event_kalenderButtonActionPerformed
-
-    private void kalenderButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_kalenderButton1ActionPerformed
-        //dateChooser.showPopup();
-    }//GEN-LAST:event_kalenderButton1ActionPerformed
-
-    private void userButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_userButtonActionPerformed
-        Setting menu = new Setting(this, true, this);
-        
-        Point p = userButton.getLocationOnScreen();
-        int x = p.x + userButton.getWidth() - menu.getWidth();
-        int y = p.y + userButton.getHeight();
-        menu.setLocation(x,y);
-        menu.setVisible(true);
-        dispose();
-    }//GEN-LAST:event_userButtonActionPerformed
 
     private void backButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_backButtonActionPerformed
        mainMenu mainMenuPage = new mainMenu(currentUser); // Kirim currentUser ke Main Menu
@@ -334,7 +383,7 @@ public class setReminder extends javax.swing.JFrame {
          */
         try {
             for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
+                if ("windows".equals(info.getName())) {
                     javax.swing.UIManager.setLookAndFeel(info.getClassName());
                     break;
                 }
@@ -353,32 +402,28 @@ public class setReminder extends javax.swing.JFrame {
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new setReminder().setVisible(true);
+                setReminder setReminderPage = new setReminder(currentUser); // Kirim currentUser ke Main Menu
+                setReminderPage.setVisible(true);
             }
         });
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton backButton;
-    private com.raven.datechooser.DateChooser dateChooser1;
     private javax.swing.JTextField dateField;
-    private javax.swing.JLabel dateNow;
-    private javax.swing.JLabel dateTitle;
     private javax.swing.JLabel dateTitle2;
-    private javax.swing.JButton jButton3;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JPanel jPanel1;
-    private javax.swing.JPanel jPanel2;
     private javax.swing.JButton kalenderButton;
-    private javax.swing.JButton kalenderButton1;
     private javax.swing.JLabel namaLabel;
+    private javax.swing.JTextField namaTugasField;
+    private javax.swing.JLabel namaTugasTitle;
     private javax.swing.JPanel navBar;
+    private javax.swing.JButton setButton;
     private javax.swing.JLabel tanggal;
     private javax.swing.JTextField timeField;
-    private javax.swing.JLabel timeNow;
     private javax.swing.JLabel timeTitle;
-    private javax.swing.JButton userButton;
     // End of variables declaration//GEN-END:variables
 }

@@ -300,8 +300,8 @@ public class taskMainMenu extends javax.swing.JFrame {
     }//GEN-LAST:event_fDeadlineMouseClicked
 
     private void reminderButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_reminderButtonActionPerformed
-          new setReminder().setVisible(true);
-       dispose();
+        new setReminder(currentUser).setVisible(true);
+        dispose();
     }//GEN-LAST:event_reminderButtonActionPerformed
 
     private void backButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_backButtonActionPerformed

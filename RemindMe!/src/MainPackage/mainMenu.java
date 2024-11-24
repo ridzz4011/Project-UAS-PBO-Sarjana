@@ -14,10 +14,12 @@ import java.awt.event.ActionListener;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
+import java.util.concurrent.TimeUnit;
 import javax.swing.JOptionPane;
 import javax.swing.Timer;
 import javax.swing.table.DefaultTableModel;
@@ -29,6 +31,7 @@ import javax.swing.table.DefaultTableModel;
 public class mainMenu extends javax.swing.JFrame {
     private Timer timer;
     private static String currentUser;
+    private String currentDateTime;
     
     public mainMenu(String currentUser) {
         this.currentUser = currentUser; // Simpan data user yang login
@@ -39,30 +42,83 @@ public class mainMenu extends javax.swing.JFrame {
         tugasTB.getTableHeader().setOpaque(false);
         tugasTB.getTableHeader().setBackground(new Color(255,234,133));
         
-        //MEnampilkan waktu
-        timer = new Timer(1000,new ActionListener() {
+        //Menampilkan waktu
+        showDayDateTime();
         
-                public void actionPerformed(ActionEvent e) {
-                showDayDateTime();
-            }
+        //Menampilkan Notifikasi
+        Timer timerNotif = new Timer(1000, (ActionEvent e) -> {
+            sentReminderNotification();
         });
-
-        timer.start();
+        timerNotif.start();
+        
     }
     
     public String currentUser() {
         return currentUser;
     }
     
-     private void showDayDateTime(){
-        Calendar calendar = Calendar.getInstance();
-        Date now = new Date();
-        SimpleDateFormat formatHari = new SimpleDateFormat("EEEE", new Locale("in", "ID"));
-        SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
-        String hari = formatHari.format(calendar.getTime());
-        String dateTime = dateFormat.format(now);
-        tanggal.setText(hari+", "+dateTime);
+    private void showDayDateTime(){
+         timer = new Timer(1000, e -> {
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            currentDateTime = sdf.format(new Date());
+            tanggal.setText(currentDateTime); // Update label dengan waktu sekarang
+         });
+         timer.start(); // Mulai timer
     }
+    
+    private void sentReminderNotification() {
+    try (Connection conn = DBConnection.konek()) {
+        SimpleDateFormat dateTimeFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        
+        String getDeadline = "SELECT idReminder, idTugas, dateTime "
+                            + "FROM pengingat "
+                            + "WHERE statusNotif = 0 AND dateTime <= ? "
+                            + "ORDER BY dateTime ASC LIMIT 1";
+        PreparedStatement pstmtDL = conn.prepareStatement(getDeadline);
+        pstmtDL.setString(1, currentDateTime);
+        ResultSet rsDL = pstmtDL.executeQuery();
+
+        if (rsDL.next()) {
+            int reminderID = rsDL.getInt("idReminder");
+            int tugasID = rsDL.getInt("idTugas");
+            String deadline = rsDL.getString("dateTime");
+
+            String getNamaTugas = "SELECT namaTugas FROM tugas WHERE idTugas = ?";
+            PreparedStatement ptsmtNT = conn.prepareStatement(getNamaTugas);
+            ptsmtNT.setInt(1, tugasID);
+            ResultSet rsNT = ptsmtNT.executeQuery();
+
+            String namaTugas = "";
+            if (rsNT.next()) {
+                namaTugas = rsNT.getString("namaTugas");
+            }
+
+            // Periksa apakah waktu sekarang berada dalam 1 menit dari deadline
+            Date currentDate = dateTimeFormat.parse(currentDateTime);
+            Date deadlineDate = dateTimeFormat.parse(deadline);
+                            
+            long diffInMillies = Math.abs(deadlineDate.getTime() - currentDate.getTime());
+            long diffInMinutes = TimeUnit.MINUTES.convert(diffInMillies, TimeUnit.MILLISECONDS);
+            
+            if (deadlineDate != null && new Date().after(currentDate)) {
+                JOptionPane.showMessageDialog(this, 
+                String.format("Pengingat untuk tugas '%s' telah tiba!", namaTugas),
+                            "Pengingat Tugas", JOptionPane.INFORMATION_MESSAGE);
+                                    
+                String updateStatus = "UPDATE pengingat SET statusNotif = 1 WHERE IdReminder = ?";
+                try (PreparedStatement ptsmtUS = conn.prepareStatement(updateStatus)) {
+                ptsmtUS.setInt(1, reminderID);
+                ptsmtUS.executeUpdate();
+                }
+            }
+            
+        }
+    } catch (SQLException | ClassNotFoundException | ParseException e) {
+        JOptionPane.showMessageDialog(this, "Error: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+        e.printStackTrace();
+    }
+}
+
      
     private void pencarian(){
         DefaultTableModel tableTugas = (DefaultTableModel) tugasTB.getModel();
@@ -198,6 +254,7 @@ public class mainMenu extends javax.swing.JFrame {
         jLabel3 = new javax.swing.JLabel();
         editButton = new javax.swing.JButton();
         sortButton = new javax.swing.JButton();
+        setReminderButton = new javax.swing.JButton();
 
         dateChooser.setForeground(new java.awt.Color(230, 194, 65));
 
@@ -335,6 +392,15 @@ public class mainMenu extends javax.swing.JFrame {
         });
         jPanel1.add(sortButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(600, 120, -1, 30));
 
+        setReminderButton.setBackground(new java.awt.Color(255, 234, 133));
+        setReminderButton.setText("Set Reminder");
+        setReminderButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                setReminderButtonActionPerformed(evt);
+            }
+        });
+        jPanel1.add(setReminderButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(240, 120, -1, -1));
+
         getContentPane().add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 700, 400));
 
         pack();
@@ -351,7 +417,7 @@ public class mainMenu extends javax.swing.JFrame {
     }//GEN-LAST:event_searchFieldActionPerformed
 
     private void searchFieldMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_searchFieldMouseClicked
-        searchField.setText("");
+       searchField.setText("");
     }//GEN-LAST:event_searchFieldMouseClicked
 
     private void searchFieldKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_searchFieldKeyTyped
@@ -375,8 +441,61 @@ public class mainMenu extends javax.swing.JFrame {
     }//GEN-LAST:event_editButtonActionPerformed
 
     private void sortButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_sortButtonActionPerformed
-        
+        DefaultTableModel tableTugas = (DefaultTableModel) tugasTB.getModel();
+        try (Connection conn = DBConnection.konek()) {
+            int jumlahRow = tugasTB.getRowCount();
+            for(int i = 0; i < jumlahRow; i++) {
+                tableTugas.removeRow(0);
+            }
+            
+            String getID = "SELECT idPengguna, namaPengguna FROM pengguna WHERE username = ?";
+            PreparedStatement pstmt1 = conn.prepareStatement(getID);           
+            pstmt1.setString(1, currentUser);
+            ResultSet rs1 = pstmt1.executeQuery();
+            
+            int userID = 0; // Default jika id tidak ditemukan
+            String namaLengkap;
+            if (rs1.next()) {
+                userID = rs1.getInt("idPengguna"); // Ambil nilai idPengguna
+                namaLengkap = rs1.getString("namaPengguna");
+                namaLabel.setText(namaLengkap);
+            } else {
+                JOptionPane.showMessageDialog(null, "ID Pengguna Tidak ditemukan", "ID NOT FOUND", JOptionPane.ERROR_MESSAGE);
+                new formLogin().setVisible(true);
+                dispose();
+                return;
+            }
+            
+            String query = "SELECT namaTugas, deadlineTugas, namaMatkul "
+                     + "FROM tugas "
+                     + "WHERE idPengguna = ? "
+                     + "ORDER BY deadlineTugas ASC"; // Urutkan berdasarkan deadline
+            PreparedStatement pstmt = conn.prepareStatement(query);           
+            pstmt.setInt(1, userID);
+            ResultSet rs = pstmt.executeQuery();
+            
+            int no = 1;
+            while (rs.next()) {
+                String baris[] = {
+                    String.valueOf(no),              // Nomor urut
+                    rs.getString("namaTugas"),       // Nama Tugas
+                    rs.getString("deadlineTugas"),   // Deadline
+                    rs.getString("namaMatkul")       // Nama Matkul
+                };
+                
+                tableTugas.addRow(baris);
+                no++;
+            }
+        } catch (SQLException | ClassNotFoundException e) {
+            
+        }
     }//GEN-LAST:event_sortButtonActionPerformed
+
+    private void setReminderButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_setReminderButtonActionPerformed
+        setReminder setReminderPage = new setReminder(currentUser); // Kirim currentUser ke Main Menu
+        setReminderPage.setVisible(true);
+        dispose(); 
+    }//GEN-LAST:event_setReminderButtonActionPerformed
 
     /**
      * @param args the command line arguments
@@ -489,6 +608,7 @@ public class mainMenu extends javax.swing.JFrame {
     private javax.swing.JLabel namaLabel;
     private javax.swing.JPanel navBar;
     private javax.swing.JTextField searchField;
+    private javax.swing.JButton setReminderButton;
     private javax.swing.JButton sortButton;
     private javax.swing.JLabel tanggal;
     private javax.swing.JTable tugasTB;
