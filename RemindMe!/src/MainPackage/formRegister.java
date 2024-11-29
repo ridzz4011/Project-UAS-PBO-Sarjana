@@ -143,7 +143,7 @@ public class formRegister extends javax.swing.JFrame {
                 checkAvailabilityButtonActionPerformed(evt);
             }
         });
-        jPanel1.add(checkAvailabilityButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(560, 140, 30, 20));
+        jPanel1.add(checkAvailabilityButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(550, 130, 50, 40));
 
         fieldUser.setBackground(new java.awt.Color(246, 246, 246));
         fieldUser.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(255, 255, 255)));

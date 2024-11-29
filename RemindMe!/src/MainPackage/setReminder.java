@@ -4,17 +4,14 @@
  */
 package MainPackage;
 
-import Custom.Setting;
 import EventHandler.DBConnection;
 import EventHandler.CekUser;
 import EventHandler.ErrorHandler;
-import java.awt.Point;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import javax.swing.Timer;
 import javax.swing.JOptionPane;
 import java.util.Locale;
-import java.text.ParseException;
 import java.sql.ResultSet;
 import java.sql.Connection;
 import java.sql.PreparedStatement;

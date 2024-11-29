@@ -10,9 +10,7 @@ import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.Date;
-import java.util.Locale;
 import javax.swing.Timer;
 
 import EventHandler.DBConnection;
@@ -23,7 +21,6 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.text.ParseException;
-import java.util.concurrent.TimeUnit;
 
 import java.sql.SQLException;
 import javax.swing.JOptionPane;
@@ -35,7 +32,7 @@ import javax.swing.table.DefaultTableModel;
  */
 public class mainMenu extends javax.swing.JFrame {
     private Timer timer;
-    private String currentUser;
+    private static String currentUser;
     private String currentDateTime;
     private int taskId;
     private String taskName;
@@ -43,6 +40,22 @@ public class mainMenu extends javax.swing.JFrame {
     public mainMenu(String currentUser) {
         this.currentUser = currentUser; // Simpan data user yang login
         initComponents();
+        
+        //Mengganti warna background header 
+        tugasTB.getTableHeader().setOpaque(false);
+        tugasTB.getTableHeader().setBackground(new Color(255,234,133));
+        
+        //Menampilkan waktu
+        timer = new Timer(1000,new ActionListener() {
+        
+            public void actionPerformed(ActionEvent e) {
+                showDayDateTime();
+            }
+        });
+
+        timer.start();
+        
+        tampilkanData();
         
         try (Connection conn = DBConnection.konek()) {
             int userID = CekUser.fetchUserId(conn, currentUser, namaLabel);
@@ -57,7 +70,7 @@ public class mainMenu extends javax.swing.JFrame {
                 
                 showDayDateTime();
         
-                Timer timerNotif = new Timer(1000, (ActionEvent e) -> {
+                Timer timerNotif = new Timer(10000, (ActionEvent e) -> {
                     sentReminderNotification();
                 });
                 
@@ -72,27 +85,6 @@ public class mainMenu extends javax.swing.JFrame {
     
     public String currentUser() {
         return currentUser;
-    }
-    
-    public mainMenu() {
-        initComponents();
-        
-    //Mengganti warna background header 
-        tugasTB.getTableHeader().setOpaque(false);
-        tugasTB.getTableHeader().setBackground(new Color(255,234,133));
-        
-        //MEnampilkan waktu
-        timer = new Timer(1000,new ActionListener() {
-        
-            public void actionPerformed(ActionEvent e) {
-                showDayDateTime();
-            }
-        }
-        );
-
-        timer.start();
-        
-        tampilkanData();
     }
     
      private void showDayDateTime(){
@@ -134,9 +126,6 @@ public class mainMenu extends javax.swing.JFrame {
                 // Periksa apakah waktu sekarang berada dalam 1 menit dari deadline
                 Date currentDate = dateTimeFormat.parse(currentDateTime);
                 Date deadlineDate = dateTimeFormat.parse(deadline);
-
-                long diffInMillies = Math.abs(deadlineDate.getTime() - currentDate.getTime());
-                long diffInMinutes = TimeUnit.MINUTES.convert(diffInMillies, TimeUnit.MILLISECONDS);
 
                 if (deadlineDate != null && new Date().after(currentDate)) {
                     JOptionPane.showMessageDialog(this, 
@@ -523,7 +512,8 @@ public class mainMenu extends javax.swing.JFrame {
 
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(() -> {
-            new mainMenu().setVisible(true);
+            mainMenu mainMenuPage = new mainMenu(currentUser); // Kirim currentUser ke Main Menu
+            mainMenuPage.setVisible(true);
         });
     }
 
